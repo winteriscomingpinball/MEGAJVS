@@ -1,6 +1,8 @@
 # MEGA-JVS
 Jamma Video Standard (JVS) IO board implemented using a MEGA 2560
 
+Based on TeensyJVS by charcole: https://github.com/charcole/TeensyJVS
+
 The included Arduino code is intended to be used with a MEGA 2560 and a MEGA JVS V2 board (created by winteriscoming).  The boards are currently not available for sale.
 
 The MEGA JVS V2 board has a micro SD slot.  Profiles are stored on the card.  The directory called SD Card Contents needs to go in the root of the Micro SD card.  This includes both PROFILES.HEX and LASTPROF.HEX.

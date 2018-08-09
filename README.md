@@ -11,6 +11,6 @@ In order to create more mapping profiles and edit existing ones, use profiles.py
 
 The use of profiles.py is not well documented yet.
 
-The MEGA JVS V2 board uses a profile button to switch profiles on-the-fly.  It also uses a small OLED display like the one found here: https://www.amazon.com/Display-Serial-Arduino-Raspberry-DIYmall/dp/B073VD6W1H/ref=sr_1_1?ie=UTF8&qid=1533843988&sr=8-1&keywords=oled+diymall
+The MEGA JVS V2 board uses a profile button to switch profiles on-the-fly.  It also uses a small OLED display like the one found <a href="https://www.amazon.com/Display-Serial-Arduino-Raspberry-DIYmall/dp/B073VD6W1H/ref=sr_1_1?ie=UTF8&qid=1533843988&sr=8-1&keywords=oled+diymall">here</a>. 
 
 The creation of this board is documented here: <a href="https://www.arcade-projects.com/forums/index.php?thread/944-custom-jvs-i-o-mega-jvs/&postID=10213#post10213">Custom JVS I/O - MEGA JVS</a>

@@ -479,7 +479,7 @@ byte P2_pins[16] =
 // Output pins in order (8,7,6,5,4,3,2,1)
 byte Output_Pins[8]=
 {
- 0,0,0,VIEW_LAMP,0,0,0,START_LAMP
+ 0,0,OUT2_3,OUT2_2,OUT2_1,OUT1_3,OUT1_2,OUT1_1
 };
 
 byte mainboard_id[255] = {

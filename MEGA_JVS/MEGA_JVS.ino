@@ -533,6 +533,28 @@ void SDReadLastProfile(){
   
 }
 
+
+//Function ot read display option from SD card
+void SDReadDisplayOptions(){
+  myFile = SD.open("DISPLAY.HEX", FILE_READ);
+  byte displaydata=0;
+
+  displaydata = myFile.read();
+  myFile.close();
+  
+  displaydata = displaydata&0x0F;
+
+  if (displaydata == 0x01){
+    //rotate display
+    Serial.println("Rotating display");
+    u8g.setRot180();
+  }
+
+  
+  
+}
+
+
 //Variable to store current special case - used for WMMT gear management.
 //Available for furture potential expansion
 byte cur_special_case = 0;
@@ -653,13 +675,17 @@ void setup()
   #endif
 
   SD.begin(53);
-  
-  u8g.begin();
-  showlogo();
 
 
   Serial.begin(115200);
   Serial1.begin(115200, SERIAL_8N1);
+
+  SDReadDisplayOptions();
+  
+  
+  u8g.begin();
+  showlogo();
+  
   //Serial.println(sizeof(mapping_profile_test));
   
   //u8g2.drawBitmap(0,0,16,54,pic_Logo_bmp);

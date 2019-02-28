@@ -293,7 +293,7 @@ byte all_inputs[34] =
 };
 
 
-//Pins defined as position in #include <Bounce2.h> array above
+//Pins defined as position in array above
 #define  PROFILE_PIN 0
 #define  P1_START  1
 #define  P1_RIGHT  2
@@ -606,6 +606,11 @@ void ApplyProfile(struct Mapping_Profile profile)
     cur_steering_options[0]=profile.steering_options[0];
     cur_steering_options[1]=profile.steering_options[1];
     cur_steering_options[2]=profile.steering_options[2];
+
+    Serial.print("Special Case from loaded profile: ");
+    Serial.println(cur_special_case);
+
+    
 }
 
 //Function to change profile.
@@ -824,12 +829,14 @@ int WMMT_Gear_Num = 1;
 
 void WMMT_Gear_Change()
 {
+
+   //Serial.println("got here");
    WMMT_shift_up_timer++;
    WMMT_shift_down_timer++;
    int shift_direction = 0;
    
          //shift down
-            if (!digitalRead(SHIFT_DOWN_PIN_NUM) && WMMT_shift_down_state == false){
+            if (!digitalRead(all_inputs[SHIFT_DOWN_PIN]) && WMMT_shift_down_state == false){
               //coin++;
               WMMT_shift_down_state = true;
               WMMT_shift_down_timer = 0;
@@ -837,7 +844,7 @@ void WMMT_Gear_Change()
             }
             
             if (WMMT_shift_down_timer > 5000){
-              if ( WMMT_shift_down_state == true && digitalRead(SHIFT_DOWN_PIN_NUM) ){
+              if ( WMMT_shift_down_state == true && digitalRead(all_inputs[SHIFT_DOWN_PIN]) ){
                 //profile code
                 
                 WMMT_shift_down_state = false;
@@ -849,7 +856,7 @@ void WMMT_Gear_Change()
             }
 
          //shift up
-            if (!digitalRead(SHIFT_UP_PIN_NUM) && WMMT_shift_up_state == false){
+            if (!digitalRead(all_inputs[SHIFT_UP_PIN]) && WMMT_shift_up_state == false){
               //coin++;
               WMMT_shift_up_state = true;
               WMMT_shift_up_timer = 0;
@@ -857,7 +864,7 @@ void WMMT_Gear_Change()
             }
             
             if (WMMT_shift_up_timer > 5000){
-              if ( WMMT_shift_up_state == true && digitalRead(SHIFT_UP_PIN_NUM) ){
+              if ( WMMT_shift_up_state == true && digitalRead(all_inputs[SHIFT_UP_PIN]) ){
                 //profile code
                 
                 WMMT_shift_up_state = false;
@@ -1713,7 +1720,7 @@ if (USB_Mode==false){
   }
 
   
-            if (special_case==3){
+            if (cur_special_case==3){
               WMMT_Gear_Change();
             }
 

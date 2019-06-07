@@ -173,7 +173,7 @@ specialcaselist= ["0 - NONE","1 - RESERVED","2 - 2 POS SHIFTER N" ,"3 - 2 POS SH
 specialcasereversedict={
    "0 - NONE" : 0,
    "1 - RESERVED" : 1,
-   "2 - RESERVED" : 2,
+   "2 - 2 POS SHIFTER N" : 2,
    "3 - 2 POS SHIFTER" : 3
    }
 

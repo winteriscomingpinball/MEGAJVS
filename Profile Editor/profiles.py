@@ -168,7 +168,7 @@ analogoptreversedict={
    "3 - SCALE & SUPPRESS" : 3
    }
 
-specialcaselist= ["0 - NONE","1 - RESERVED","2 - RESERVED" ,"3 - 2 POS SHIFTER"]
+specialcaselist= ["0 - NONE","1 - RESERVED","2 - 2 POS SHIFTER N" ,"3 - 2 POS SHIFTER"]
 
 specialcasereversedict={
    "0 - NONE" : 0,

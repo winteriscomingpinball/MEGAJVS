@@ -1,6 +1,6 @@
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
-//MEGA JVS - Code V1.0 - For MEGA JVS V2 Board
+//MEGA JVS - Code V1.0 - For MEGA JVS V2 Boardc
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
 //TeensyJVS code was used with permission by the author.
@@ -877,7 +877,12 @@ void WMMT_Gear_Change()
 
 
           //change gear
-          if (shift_direction == -1 && WMMT_Gear_Num>1){
+          if (shift_direction == -1 && WMMT_Gear_Num>1 && cur_special_case==3){
+            //shift geear down
+            WMMT_Gear_Num--;
+            
+          }
+          if (shift_direction == -1 && WMMT_Gear_Num>0 && cur_special_case==2){
             //shift geear down
             WMMT_Gear_Num--;
             
@@ -1126,8 +1131,8 @@ void ProcessPacket(struct Packet *p)
       
                   
       
-                  //If special case is 3, then apply current gear bits for WMMT
-                      if (cur_special_case==3){
+                  //If special case is 3 or 2, then apply current gear bits for WMMT
+                      if (cur_special_case==3 || cur_special_case==2){
                         switch(WMMT_Gear_Num){
                           case 1:
                                result_p1_2 |= B10100000;
@@ -1147,8 +1152,6 @@ void ProcessPacket(struct Packet *p)
                           case 6:
                                result_p1_2 |= B01010000;
                           break;
-                          
-                          
                         }
                         
                       }
@@ -1720,7 +1723,7 @@ if (USB_Mode==false){
   }
 
   
-            if (cur_special_case==3){
+            if (cur_special_case==3 || cur_special_case==2){
               WMMT_Gear_Change();
             }
 
@@ -1836,5 +1839,3 @@ else{
 }
   
 }
-
-

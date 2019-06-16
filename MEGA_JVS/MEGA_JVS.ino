@@ -1,6 +1,8 @@
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
-//MEGA JVS - Code V1.0 - For MEGA JVS V2 Boardc
+//Confirmed working on Arduino IDE version 1.6.12
+
+//MEGA JVS - Code V1.0 - For MEGA JVS V2 Board
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
 //TeensyJVS code was used with permission by the author.

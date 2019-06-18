@@ -241,6 +241,7 @@ enum
 long logo_timer = 0;
 bool logoOn = true;
 
+bool waitForComms = true;
 struct Packet
 {
   int address;
@@ -536,7 +537,7 @@ void SDReadLastProfile(){
 }
 
 
-//Function ot read display option from SD card
+//Function to read display option from SD card
 void SDReadDisplayOptions(){
   myFile = SD.open("DISPLAY.HEX", FILE_READ);
   byte displaydata=0;
@@ -663,6 +664,19 @@ void ChangeProfile()
       logo_timer = millis();
       logoOn = false;
   
+}
+
+void setWaitForCommsDisplay()
+{
+  u8g.firstPage();
+      do {
+        u8g.setFont(u8g_font_timB10);
+        u8g.drawStr(30,10,"Waiting for");
+        u8g.drawStr(50,30,"JVS");
+        u8g.drawStr(15,50,"Communication");
+      } while ( u8g.nextPage() );
+      logo_timer = millis();
+      logoOn = false;
 }
 
 void Array_Copy(byte array1[],byte array2[], int byte_count)
@@ -807,6 +821,8 @@ void setup()
 
   logo_timer = millis();
   logoOn = false;
+
+  setWaitForCommsDisplay();
 
 }
 
@@ -997,6 +1013,7 @@ void ProcessPacket(struct Packet *p)
           digitalWrite(VIEW_LAMP,LOW);
           coin1_val=0;
           coin2_val=0;
+          waitForComms=true;
       
           
           sz = 2;
@@ -1053,6 +1070,7 @@ void ProcessPacket(struct Packet *p)
         case CMD_GETFEATURES:
           Serial.println("CMD_GETFEATURES");
           ReplyBytes(features, sizeof(features));
+          waitForComms=false;
           break;
         case CMD_SETMAINBOARDID:
           {
@@ -1573,7 +1591,7 @@ byte serialbuffer[4]={0,0,0,0};
 void loop()
 {
 
-  if (logoOn==false && millis()-logo_timer >5000){
+  if (logoOn==false && millis()-logo_timer >5000 && waitForComms==false){
     //u8g2.clearDisplay();
     Serial.print("millis():");
     Serial.println(millis());

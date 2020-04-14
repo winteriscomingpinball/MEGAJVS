@@ -1,11 +1,15 @@
 from tkinter import *
 from tkinter import filedialog, ttk
+from tkinter.scrolledtext import ScrolledText
 import serial
 
 import struct
 
+IdInfo=bytearray(0);
+
 profilearray = bytearray(62)
 profilelist=[]
+IdDict={}
 profilecount=0
 
 savedindex=0
@@ -179,9 +183,11 @@ specialcasereversedict={
 
 
 filename =""
+IdFilename = ""
 outfilename ="testsave.hex"
 
 def openprofiles():
+   updateIdLength()
    labelStatus.configure(fg="black",text="")
    global profilelist
    profilelist[:]=[]
@@ -214,7 +220,54 @@ def openprofiles():
    comboProfiles.current(newindex=0)
    selectedprofile(0)
 
+def openIDs():
+   labelStatus.configure(fg="black",text="")
+   global IdInfo
+   global IdFilename
+   global filename
+
+
+   IdFilename = filedialog.askopenfilename(filetypes=[("HEX files","*.hex")],title="Open IDs file.")
+   f = open(IdFilename,'rb')
+   IdInfo = f.read()
+   f.close()
+   readIDs()
+   if filename:
+      reopenprofiles()
+
+
+def readIDs():
+   global IdInfo
+   global IdDict
+
+   IdDict.clear()
+   
+   #print (IDInfo)
+   print ("Reading in ID Info File")
+   bytecounter=0
+
+   
+   while bytecounter<len(IdInfo):
+      profileName= (IdInfo[bytecounter:bytecounter+4]).decode('utf-8')
+      bytecounter+=4
+      IdLength=(int.from_bytes(IdInfo[bytecounter:bytecounter+1], byteorder='big'))
+      bytecounter+=1
+      ID=IdInfo[bytecounter:bytecounter+IdLength].decode('utf-8')
+      IdDict[profileName]=ID
+      #print(profileName)
+      #print("Length: " + str(IdLength))
+      #print(ID)
+      bytecounter+=IdLength
+
+   for item in IdDict:
+    print (item)
+   #print (len(IdDict))
+   
+   
+
+
 def reopenprofiles():
+   updateIdLength()
    labelStatus.configure(fg="black",text="")
    global profilelist
    profilelist[:]=[]
@@ -466,7 +519,15 @@ def exportprofile():
       labelStatus.configure(fg="red",text="No file selected!")
    
 def saveprofile():
+
+   global IdDict
+   
+   commitIdChange()
+
+      
    global filename
+   global IdFilename
+   
    global savedindex
    if filename:
       print("Saving profile")
@@ -571,10 +632,28 @@ def saveprofile():
       f.write(byteval.to_bytes(1,byteorder='little'))
 
       f.close()
+
+
+      if IdFilename:
+         f = open(IdFilename,'w+b')
+         for item in IdDict:
+            f.write(item.encode())
+            f.write(len(IdDict[item]).to_bytes(1,byteorder='little'))
+            f.write(IdDict[item].encode())
+         f.close()
+         
       
       reopenprofiles()
 
-      
+      statusText = "Profiles "
+
+      if IdFilename:
+         statusText += "and IDs "
+
+      statusText += "saved"
+         
+
+      labelStatus.configure(fg="green",text=statusText)
    else:
       print("No file has been selected")
       labelStatus.configure(fg="red",text="No file selected!")
@@ -888,7 +967,38 @@ def moveprofiledown():
       f.close()
       deleteprofileatindex(index,size+1)
 
+def commitIdChange():
+   print("Committing ID change")
+   global IdDict
+
+   getIdText = txtIdString.get("1.0", END)
+
+   getIdText = getIdText[:len(getIdText)-1]
+   if len(getIdText)>100:
+      getIdText=getIdText[:100]
+
+   if getIdText and str(comboProfiles.get()).replace(b'\x00'.decode("utf-8")," "):
+      IdDict[str(comboProfiles.get()).replace(b'\x00'.decode("utf-8")," ")]=getIdText
+
+
+def deleteId():
+   print("Deleting ID")
+   global IdDict
+   
+   try:
+      IdDict.pop(str(comboProfiles.get()).replace(b'\x00'.decode("utf-8")," "))
+      print ("ID Deleted")
+   except:
+      print ("ID has not been saved for this profile.  Nothing to delete.")
+   txtIdString.delete('1.0', END)
+   updateIdLength()
+   
+   
+
 def selectedprofile(val):
+   
+   
+   
    labelStatus.configure(fg="black",text="")
    indexval= comboProfiles.current()
    print("selected a profile")
@@ -976,8 +1086,56 @@ def selectedprofile(val):
    
    f.close()
    selectedanalogopt(0)
+   txtIdString.delete('1.0', END)
+   insertVal=""
+   try:
+      insertVal = IdDict[str(comboProfiles.get()).replace(b'\x00'.decode("utf-8")," ")]
+   except:
+      print("No ID string found for: " + str(comboProfiles.get()).replace(b'\x00'.decode("utf-8")," "))
+   print("Inserting this value into ID String: " + insertVal)
+   txtIdString.insert(INSERT, insertVal)
+
+   #for item in IdDict:
+   #   print (item + ": " + IdDict[item])
+
+   updateIdLength()
+
+
+def key(event):
+   updateIdLength()
+def exit_(event):
+   updateIdLength()
+def enter(event):
+   updateIdLength()
+
+def updateIdLength():
+   global IdFilename
+   global filename
+   
+   getIdText = txtIdString.get("1.0", END)
+   getIdText = getIdText[:len(getIdText)-1]
+   IdLen=len(getIdText)
+
+   labelColor = "black"
+
+   if IdLen>0 and IdLen<101:
+      labelColor="green"
+   elif IdLen>100:
+      labelColor="red"
+      txtIdString.delete('1.0', END)
+      getIdText=getIdText[:100]
+      txtIdString.insert(INSERT, getIdText)
+      IdLen=len(getIdText)
+      
+   if IdFilename and filename:
+      labelIdStringLength.configure(fg=labelColor,text="Length: " + str(IdLen))
+   elif filename:
+      labelIdStringLength.configure(fg="red",text="ID File not open!")
+   else:
+      labelIdStringLength.configure(fg="red",text="Profile File\nnot open!")
 
 root = Tk()
+
 menubar = Menu(root)
 root.config(menu=menubar)
 root.wm_title("MEGA JVS PROFILE EDITOR")
@@ -987,6 +1145,7 @@ submenu = Menu(menubar,tearoff=0)
 menubar.add_cascade(label="File",menu=submenu);
 menubar.add_command(label = "Profile Manager",command=profilemanager)
 submenu.add_command(label = "Open Profiles",command=openprofiles)
+submenu.add_command(label = "Open IDs",command=openIDs)
 
 
 menubar.add_command(label = "Re-Open Config",command=readconfigfile)
@@ -1000,6 +1159,7 @@ buttonSaveProfile = ttk.Button(root, text='Save Current Profile', command=savepr
 buttonExportProfile = ttk.Button(root, text='Export Current Profile', command=exportprofile, width = 20)
 buttonImportProfile = ttk.Button(root, text='Import Profile', command=importprofile, width = 20)
 
+buttonDeleteId = ttk.Button(root, text='Delete ID', command=deleteId, width = 20)
 
 labelChooseProf = Label(text="Choose Profile", fg="black",justify=LEFT,anchor=W,width = 15)
 labelDigitalInputs = Label(text="Digital Inputs:", fg="black",justify=LEFT,anchor=W,width = 15)
@@ -1009,6 +1169,9 @@ labelOutputReport = Label(text="Reported Ouputs:", fg="black",justify=LEFT,ancho
 labelAnalogOptions = Label(text="Analog Options:", fg="black",justify=LEFT,anchor=W,width = 17)
 
 labelSpecialCase = Label(text="Special Case:", fg="black",justify=LEFT,anchor=W,width = 17)
+comboSpecialCase = ttk.Combobox(root)
+
+labelId = Label(text="ID String \n(100 char max):", fg="black",justify=LEFT,anchor=W,width = 17)
 comboSpecialCase = ttk.Combobox(root)
 
 labelStatus = Label(text="", fg="black",justify=LEFT,anchor=W,width = 17)
@@ -1128,6 +1291,14 @@ comboOut2_3=ttk.Combobox(root)
 
 txtOutputCount = Entry(root)
 
+txtIdString = ScrolledText(root, width=20, height=5)
+txtIdString.bind("<Key>", key)
+txtIdString.bind('<Leave>', exit_)
+root.bind("<Enter>",enter)
+
+labelIdStringLength = Label(text="Length:", fg = "black",anchor=W,width = 15)
+
+
 labelAnalogOpts = Label(text="Option:", fg="black",justify=RIGHT,anchor=E,width = 15)
 comboAnalogOpts = ttk.Combobox(root)
 
@@ -1157,7 +1328,7 @@ txtName.grid(row=1,column=1)
 
 labelStatus.grid(row=0,column=5)
 
-labelDigitalInputs.grid(row=3,column=0)
+labelDigitalInputs.grid(row=3,column=0, pady=10)
 
 labelP1Start.grid(row=4, column=0)
 comboP1Start.grid(row=4, column=1)
@@ -1228,7 +1399,7 @@ labelP2B10.grid(row=19, column=3)
 comboP2B10.grid(row=19, column=4)
 
 
-labelAnalogInputs.grid(row=22,column=0)
+labelAnalogInputs.grid(row=22,column=0, pady=10)
 labelA0.grid(row=23, column=0)
 comboA0.grid(row=23, column=1)
 labelA1.grid(row=24, column=0)
@@ -1263,10 +1434,10 @@ comboOut2_1.grid(row=29, column=4)
 comboOut2_2.grid(row=30, column=4)
 comboOut2_3.grid(row=31, column=4)
 
-labelOutputReport.grid(row=33, column=0)
+labelOutputReport.grid(row=33, column=0, pady=10)
 txtOutputCount.grid(row=33, column=1)
 
-labelAnalogOptions.grid(row=35,column=0)
+labelAnalogOptions.grid(row=35,column=0, pady=10)
 labelAnalogOpts.grid(row=36,column=0)
 comboAnalogOpts.grid(row=36,column=1)
 comboAnalogOpts.state(['readonly'])
@@ -1279,12 +1450,19 @@ txtAnalogMax.grid(row=38,column=3)
 #ScaleAnalogMin.grid(row=38,column=2)
 #ScaleAnalogMax.grid(row=38,column=5)
 
-labelActualMin.grid(row=37,column=1)
-labelActualMax.grid(row=37,column=3)
+labelActualMin.grid(row=37,column=1, pady=10)
+labelActualMax.grid(row=37,column=3, pady=10)
 
 
-labelSpecialCase.grid(row=40,column=0)
+labelSpecialCase.grid(row=40,column=0, pady=20)
 comboSpecialCase.grid(row=40,column=1)
+
+labelId.grid(row=43,column=0, pady=20)
+txtIdString.grid(row=43, column=1, pady=20)
+buttonDeleteId.grid(row=43, column=3, pady=20)
+
+labelIdStringLength.grid(row=43, column=2)
+   
 comboSpecialCase.state(['readonly'])
    
 comboP1B1.state(['readonly'])
@@ -1576,6 +1754,9 @@ buttonMoveProfileDown = ttk.Button(profilemanagerwindow, text='Move Down', comma
 
 
 frame = Frame(profilemanagerwindow,width=32,height=31)
+
+
+
 scrollbar = Scrollbar(frame, orient=VERTICAL)
 listboxprofiles = Listbox(frame, yscrollcommand=scrollbar.set)
 listboxprofiles.configure(height=30,width=20)

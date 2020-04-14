@@ -2,7 +2,7 @@
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.0 - For MEGA JVS V2 Board
+//MEGA JVS - Code V1.1 - For MEGA JVS V2 Board
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
 //TeensyJVS code was used with permission by the author.
@@ -256,6 +256,9 @@ struct Reply
   byte message[255];
 };
 
+byte profileID[100];
+bool profileIDSet = false;
+byte IDLength = 0;
 
 byte all_inputs[34] = 
 {
@@ -513,48 +516,100 @@ void showlogo(){
 
 //Function to read last profile used from SD card.
 void SDReadLastProfile(){
-  myFile = SD.open("LASTPROF.HEX", FILE_READ);
+  if (SD.exists("LASTPROF.HEX")) {
+      myFile = SD.open("LASTPROF.HEX", FILE_READ);
+    
+      lastprofilenum = myFile.read();
+      myFile.close();
+    
+      Serial.print("Read LASTPROF.HEX: ");
+      Serial.println(lastprofilenum);
+    
+      myFile = SD.open("PROFILES.HEX", FILE_READ);
+      myFile.seek(lastprofilenum*62);
+      myFile.read(profbuff, 62);
+    
+      profilecount = myFile.size()/62;
+    
+      Serial.print("Profile Count from SD Card: ");
+      Serial.println(profilecount);
+      
+      myFile.close();
+    
+      current_profile_num = lastprofilenum;
+  }
+  else{
+    Serial.println("Can't find LASTPROF.HEX on SD card.");
+  }
+}
 
-  lastprofilenum = myFile.read();
-  myFile.close();
+//Function to lookup ID String from SD card.
+void SDLookupIDString(){
+  Serial.println("Looking up ID...");
+  profileIDSet = false;
+  IDLength=0;
 
-  Serial.print("Read LASTPROF.HEX: ");
-  Serial.println(lastprofilenum);
-
-  myFile = SD.open("PROFILES.HEX", FILE_READ);
-  myFile.seek(lastprofilenum*62);
-  myFile.read(profbuff, 62);
-
-  profilecount = myFile.size()/62;
-
-  Serial.print("Profile Count from SD Card: ");
-  Serial.println(profilecount);
-  
-  myFile.close();
-
-  current_profile_num = lastprofilenum;
-  
+  if (SD.exists("IDS.HEX")) {
+      myFile = SD.open("IDS.HEX", FILE_READ);
+      
+      myFile.seek(0);
+    
+      Serial.println("Looking for this profile name:");
+      Serial.println(current_profile_name);
+      bool FoundID=myFile.find(current_profile_name);
+      
+      if (FoundID){
+        IDLength=myFile.read();
+        Serial.print("ID Length is: ");
+        Serial.println(IDLength);
+        memset(profileID, 0, 100);
+        myFile.read(profileID, IDLength);
+        profileIDSet = true;
+        Serial.println("ID found!");
+        Serial.print("#####");
+        for (byte i = 0; i < IDLength; i = i + 1) {
+          
+          Serial.write(profileID[i]);
+          
+        }
+        Serial.print("#####");
+      }
+      else{
+        Serial.println("ID not found.");
+      }
+      
+      myFile.close();
+  }
+  else{
+    Serial.println("Can't find IDS.HEX on SD card.");
+  }
 }
 
 
 //Function to read display option from SD card
 void SDReadDisplayOptions(){
-  myFile = SD.open("DISPLAY.HEX", FILE_READ);
-  byte displaydata=0;
 
-  displaydata = myFile.read();
-  myFile.close();
-  
-  displaydata = displaydata&0x0F;
-
-  if (displaydata == 0x01){
-    //rotate display
-    Serial.println("Rotating display");
-    u8g.setRot180();
+  if (SD.exists("DISPLAY.HEX")) {
+      myFile = SD.open("DISPLAY.HEX", FILE_READ);
+      byte displaydata=0;
+    
+      displaydata = myFile.read();
+      myFile.close();
+      
+      displaydata = displaydata&0x0F;
+    
+      Serial.println("Checking display rotation value in DISPLAY.HEX:");
+      Serial.println(displaydata);
+    
+      if (displaydata == 0x01){
+        //rotate display
+        Serial.println("Rotating display");
+        u8g.setRot180();
+      }
   }
-
-  
-  
+  else{
+    Serial.println("Can't find DISPLAY.HEX on SD card.");
+  }
 }
 
 
@@ -578,21 +633,32 @@ bool USBswitchmode = false;
 
 //Function to read a specific profile from SD card.
 void SDReadProfileX(byte profilex){
-  myFile = SD.open("PROFILES.HEX", FILE_READ);
-  myFile.seek(profilex*62);
-  myFile.read(profbuff, 62);
-  myFile.close();
+  if (SD.exists("PROFILES.HEX")) {
+      myFile = SD.open("PROFILES.HEX", FILE_READ);
+      myFile.seek(profilex*62);
+      myFile.read(profbuff, 62);
+      myFile.close();
+  }
+  else{
+    Serial.println("Can't find PROFILES.HEX on SD card.");
+  }
 }
 
 //Function to write last profile used to SD card.
 void SDWriteLastProfile(byte profilex){
-  myFile = SD.open("LASTPROF.HEX", FILE_WRITE);
-  myFile.seek(0);
-  myFile.write(profilex);
-  myFile.close();
-
-  Serial.print("Wrote profile num to SD card: ");
-  Serial.println(profilex);
+  if (SD.exists("LASTPROF.HEX")) {
+    myFile = SD.open("LASTPROF.HEX", FILE_WRITE);
+    
+    myFile.seek(0);
+    myFile.write(profilex);
+    myFile.close();
+  
+    Serial.print("Wrote profile num to SD card: ");
+    Serial.println(profilex);
+  }
+  else{
+    Serial.println("Can't find LASTPROF.HEX on SD card.");
+  }
 }
 
 
@@ -613,7 +679,7 @@ void ApplyProfile(struct Mapping_Profile profile)
     Serial.print("Special Case from loaded profile: ");
     Serial.println(cur_special_case);
 
-    
+    SDLookupIDString();
 }
 
 //Function to change profile.
@@ -1034,23 +1100,40 @@ void ProcessPacket(struct Packet *p)
 
         case CMD_READID:
         {
-          #if defined(__AVR_ATmega2560__)
-          char full_id[]="MEGA JVS;I/O BD JVS;MEGA 2560 Version;Profile:";
-          //char full_id[]="SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551 ;Ver1.00;98/10";
-          //char full_id[]=  "SEGA CORPORATION;I/O BD JVS;837-14572;Ver1.00;2005/10";
-          #endif
-          #if defined (_VARIANT_ARDUINO_DUE_X_)
-          char full_id[]="MEGA JVS;I/O BD JVS;DUE Version;Profile:";
-          #endif
-          int i2=0;
-          int id_size = sizeof(full_id);
-          for (int i = id_size-1; i<id_size+8; i++){
-           full_id[i]=current_profile_name[i2];
-           i2++;
-          }
-          Serial.println(full_id);
-          ReplyBytes((const byte*)full_id, id_size+5);
           Serial.println("CMD_READID");
+          if (profileIDSet){
+              char full_id[]="";
+              Serial.print("ID Length is: ");
+              Serial.println(IDLength);
+              //Serial.println("##########");
+              //Serial.write(profileID);
+              //Serial.println("##########");
+              ReplyBytes((const byte*)profileID, IDLength);
+          }
+          else{
+              #if defined(__AVR_ATmega2560__)
+              char full_id[]="MEGA JVS;I/O BD JVS;MEGA 2560 Version;Profile:";
+              //char full_id[]="SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551 ;Ver1.00;98/10";
+              //char full_id[]=  "SEGA CORPORATION;I/O BD JVS;837-14572;Ver1.00;2005/10";
+              #endif
+              #if defined (_VARIANT_ARDUINO_DUE_X_)
+              char full_id[]="MEGA JVS;I/O BD JVS;DUE Version;Profile:";
+              #endif
+              int i2=0;
+              int id_size = sizeof(full_id);
+              for (int i = id_size-1; i<id_size+8; i++){
+               full_id[i]=current_profile_name[i2];
+               i2++;
+              }
+              Serial.println(full_id);
+              ReplyBytes((const byte*)full_id, id_size+5);
+          }
+
+          
+          
+          
+          
+          
           break;
         }
         case CMD_FORMATVERSION:

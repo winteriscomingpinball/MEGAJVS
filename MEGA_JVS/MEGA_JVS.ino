@@ -1,8 +1,10 @@
+char versionNum[9]="v01.01.04";
+
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.1.3 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.1.4 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -740,8 +742,8 @@ void setWaitForCommsDisplay()
   u8g.firstPage();
       do {
         u8g.setFont(u8g_font_timB10);
-        u8g.drawStr(30,10,"Waiting for");
-        u8g.drawStr(30,30,"JVS Comm");
+        u8g.drawStr(32,10,versionNum);
+        u8g.drawStr(1,30,"Wait for JVS Comm");
         u8g.drawStr(25,50,"Profile: ");
         u8g.drawStr(75,50, current_profile_name);
       } while ( u8g.nextPage() );

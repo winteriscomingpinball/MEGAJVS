@@ -1064,6 +1064,13 @@ void Resend()
 #define ReplyString(str) ReplyBytes((const byte*)str,sizeof(str))
 #define ReplyByte(b)   do { tmp[0]=b; ReplyBytes(tmp, 1); } while(0)
 
+
+
+uint16_t coinModifier = 0;
+byte slotNum =0;
+
+
+
 void ProcessPacket(struct Packet *p)
 {
   if (p->address == 0xFF || p->address == deviceId) // Yay, it's for me
@@ -1319,19 +1326,49 @@ void ProcessPacket(struct Packet *p)
           Resend();
           break;
         case CMD_WRITECOINSUBTRACT:
+          {
+          
+          slotNum= message[1];
+          coinModifier = (message[2] << 8) | message[3];
+          
           Serial.println("CMD_WRITECOINSUBTRACT");
-          sz = 4;
           
-          Serial.println("Start: ");
-          for (int i=0; i<50; i++){
-            Serial.print(": 0x");
-            Serial.print(packet.message[i],HEX);
+              sz = 4;
+            
+            
+            
+                  if (slotNum == 1)
+                  {
+                      if ((coin1_val - coinModifier) >= 0)
+                      {
+                          coin1_val -= coinModifier;
+                      }
+                      else
+                      {
+                          coin1_val = 0;
+                      }
+                  } else if (slotNum == 2)
+                  {
+                      if ((coin2_val - coinModifier) >= 0)
+                      {
+                          coin2_val -= coinModifier;
+                      }
+                      else
+                      {
+                          coin2_val = 0;
+                      }
+                  }
+            //Serial.println("Start: ");
+            //for (int i=0; i<50; i++){
+            //  Serial.print(": 0x");
+            //  Serial.print(packet.message[i],HEX);
+            //}
+            //Serial.println(": End");
+            
+            
+            Reply();
+            break;
           }
-          Serial.println(": End");
-          
-          
-          Reply();
-          break;
         case CMD_WRITEPAYOUT:
           Serial.println("CMD_WRITEPAYOUT");
           sz = 4;
@@ -1371,10 +1408,31 @@ void ProcessPacket(struct Packet *p)
           Reply();
           break;
         case CMD_WRITECOINADDED:
-          Serial.println("CMD_WRITECOINADDED");
+          {
+            Serial.println("CMD_WRITECOINADDED");
+          
           sz = 4;
+
+                    coinModifier = (message[2] << 8) | message[3];
+                    slotNum= message[1];
+          
+                if (slotNum == 1)
+                {
+                    
+                        coin1_val += coinModifier;
+                    
+                } else if (slotNum == 2)
+                {
+                   
+                        coin2_val += coinModifier;
+                  
+
+                }
+
+                
           Reply();
           break;
+          }
         case CMD_WRITEPAYOUTSUBTRACT:
           Serial.println("CMD_WRITEPAYOUTSUBTRACT");
           sz = 4;

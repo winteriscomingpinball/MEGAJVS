@@ -1410,204 +1410,6 @@ void ProcessPacket(struct Packet *p)
   else
   {
     //Serial.println("Not for me");
-
-
-    //read digital inputs
-    byte mask = 1;
-            
-            
-            if(!USBswitchmode){
-          testbuttonstatus = 0;
-          result_p1_1 = 0;
-          result_p1_2 = 0;
-
-          result_p2_1 = 0;
-          result_p2_2 = 0;
-              
-                  //P1 switches
-                  for (int i = 0; i < 8; i++)
-                      {
-                        if(P1_pins[i]>0){
-                          debouncerarray[P1_pins[i]].update();
-                          if (!debouncerarray[P1_pins[i]].read())
-                            result_p1_1 |= mask;
-                        }
-                        mask <<= 1;
-                      }
-                      mask = 1;
-                      for (int i = 8; i < 16; i++)
-                      {
-                        if(P1_pins[i]>0){
-                          debouncerarray[P1_pins[i]].update();
-                          if (!debouncerarray[P1_pins[i]].read())
-                            result_p1_2 |= mask;
-                        }
-                        mask <<= 1;
-                      }
-                      mask = 1;
-      
-                      
-                  
-                  //P2 switches
-                      for (int i = 0; i < 8; i++)
-                      {
-                        if(P2_pins[i]>0){
-                          debouncerarray[P2_pins[i]].update();
-                          if (!debouncerarray[P2_pins[i]].read())
-                            result_p2_1 |= mask;
-                        }
-                        mask <<= 1;
-                      }
-                      mask = 1;
-                      for (int i = 8; i < 16; i++)
-                      {
-                        if(P2_pins[i]>0){
-                          debouncerarray[P2_pins[i]].update();
-                          if (!debouncerarray[P2_pins[i]].read())
-                            result_p2_2 |= mask;
-                        }
-                        mask <<= 1;
-                        
-                      }
-                      
-      
-                  //Test pin
-                  debouncerarray[TEST].update();
-                  if (!debouncerarray[TEST].read()){
-                    testbuttonstatus= 0x80;
-                  }
-      
-                  
-      
-                  //If special case is 3 or 2, then apply current gear bits for WMMT
-                      if (cur_special_case==3 || cur_special_case==2){
-                        switch(WMMT_Gear_Num){
-                          case 1:
-                               result_p1_2 |= B10100000;
-                          break;
-                          case 2:
-                               result_p1_2 |= B01100000;
-                          break;
-                          case 3:
-                               result_p1_2 |= B10000000;
-                          break;
-                          case 4:
-                               result_p1_2 |= B01000000;
-                          break;
-                          case 5:
-                               result_p1_2 |= B10010000;
-                          break;
-                          case 6:
-                               result_p1_2 |= B01010000;
-                          break;
-                        }
-                        
-                      }
-            }
-
-            //read analog inputs
-
-            for (int i = 0; i < 8; i++)
-            { 
-              int analogVal = 0;
-              byte analogByte1 = 0;
-              byte analogByte2 = 0;
-              if (cur_analog_channel_pins[i] != 0){
-                analogVal = analogRead(cur_analog_channel_pins[i]);
-
-               //Check if steering channel and apply special cases if needed.
-               switch (i)
-               {
-                case 0:
-                {
-                //apply scaling to steering if steering option is set to 2 or 3
-               
-                if (cur_steering_options[0]==2 || cur_steering_options[0]==3){
-                  analogByte1 = analogVal>>2;
-                  analogByte1 = map(analogByte1,STEERING_MIN,STEERING_MAX,cur_steering_options[1],cur_steering_options[2]);
-                  analogByte2 = 0;
-                }
-                else{
-                  analogByte1 = analogVal>>2;
-                  analogByte2 = analogVal<<6;
-                }
-                
-               }
-
-               
-               break;
-
-               case 1:
-               {
-                //Do Nothing
-               }
-
-               analogByte1 = analogVal>>2;
-               analogByte2 = analogVal<<6;
-                
-               break;
-
-               case 2:
-               {
-                //Do Nothing
-               }
-               analogByte1 = analogVal>>2;
-               analogByte2 = analogVal<<6;
-               break;
-               
-               default:
-               analogByte1 = analogVal>>2;
-               analogByte2 = analogVal<<6;
-               break;
-               }
-                
-                
-                
-              
-              }
-              else{
-                analogByte1 =0;
-                analogByte2 =0;
-              }
-
-              
-              //suppress 2nd byte of analog data if steering options are set to 1 or 3
-              if (cur_steering_options[0]==1 || cur_steering_options[0]==3){
-                 analogByte2 = 0x00;
-              }
-
-              
-              analog_channel_data[i*2] = analogByte1;
-              analog_channel_data[i*2 + 1] = analogByte2;
-            }
-
-            
-
-            //read coins
-            debouncerarray[COIN1].update();
-            if (!debouncerarray[COIN1].read()){
-              //coin++;
-              coin1_state = true;
-            }
-
-            debouncerarray[COIN2].update();
-            if (!debouncerarray[COIN2].read()){
-              //coin2++;
-              coin2_state = true;
-            }
-
-            if (coin1_state == true && debouncerarray[COIN1].read() ){
-              coin1_val++;
-              coin1_state = false;
-            }
-
-            if (coin2_state == true && debouncerarray[COIN2].read() ){
-              coin2_val++;
-              coin2_state = false;
-            }
-            
-
-            
   }
 }
 
@@ -1955,6 +1757,205 @@ if (USB_Mode==false){
         break;
     }
     digitalWrite(PIN_LED, HIGH);
+  }else{
+
+    //read digital inputs
+    byte mask = 1;
+            
+            
+            if(!USBswitchmode){
+          testbuttonstatus = 0;
+          result_p1_1 = 0;
+          result_p1_2 = 0;
+
+          result_p2_1 = 0;
+          result_p2_2 = 0;
+              
+                  //P1 switches
+                  for (int i = 0; i < 8; i++)
+                      {
+                        if(P1_pins[i]>0){
+                          debouncerarray[P1_pins[i]].update();
+                          if (!debouncerarray[P1_pins[i]].read())
+                            result_p1_1 |= mask;
+                        }
+                        mask <<= 1;
+                      }
+                      mask = 1;
+                      for (int i = 8; i < 16; i++)
+                      {
+                        if(P1_pins[i]>0){
+                          debouncerarray[P1_pins[i]].update();
+                          if (!debouncerarray[P1_pins[i]].read())
+                            result_p1_2 |= mask;
+                        }
+                        mask <<= 1;
+                      }
+                      mask = 1;
+      
+                      
+                  
+                  //P2 switches
+                      for (int i = 0; i < 8; i++)
+                      {
+                        if(P2_pins[i]>0){
+                          debouncerarray[P2_pins[i]].update();
+                          if (!debouncerarray[P2_pins[i]].read())
+                            result_p2_1 |= mask;
+                        }
+                        mask <<= 1;
+                      }
+                      mask = 1;
+                      for (int i = 8; i < 16; i++)
+                      {
+                        if(P2_pins[i]>0){
+                          debouncerarray[P2_pins[i]].update();
+                          if (!debouncerarray[P2_pins[i]].read())
+                            result_p2_2 |= mask;
+                        }
+                        mask <<= 1;
+                        
+                      }
+                      
+      
+                  //Test pin
+                  debouncerarray[TEST].update();
+                  if (!debouncerarray[TEST].read()){
+                    testbuttonstatus= 0x80;
+                  }
+      
+                  
+      
+                  //If special case is 3 or 2, then apply current gear bits for WMMT
+                      if (cur_special_case==3 || cur_special_case==2){
+                        switch(WMMT_Gear_Num){
+                          case 1:
+                               result_p1_2 |= B10100000;
+                          break;
+                          case 2:
+                               result_p1_2 |= B01100000;
+                          break;
+                          case 3:
+                               result_p1_2 |= B10000000;
+                          break;
+                          case 4:
+                               result_p1_2 |= B01000000;
+                          break;
+                          case 5:
+                               result_p1_2 |= B10010000;
+                          break;
+                          case 6:
+                               result_p1_2 |= B01010000;
+                          break;
+                        }
+                        
+                      }
+            }
+
+            //read analog inputs
+
+            for (int i = 0; i < 8; i++)
+            { 
+              int analogVal = 0;
+              byte analogByte1 = 0;
+              byte analogByte2 = 0;
+              if (cur_analog_channel_pins[i] != 0){
+                analogVal = analogRead(cur_analog_channel_pins[i]);
+
+               //Check if steering channel and apply special cases if needed.
+               switch (i)
+               {
+                case 0:
+                {
+                //apply scaling to steering if steering option is set to 2 or 3
+               
+                if (cur_steering_options[0]==2 || cur_steering_options[0]==3){
+                  analogByte1 = analogVal>>2;
+                  analogByte1 = map(analogByte1,STEERING_MIN,STEERING_MAX,cur_steering_options[1],cur_steering_options[2]);
+                  analogByte2 = 0;
+                }
+                else{
+                  analogByte1 = analogVal>>2;
+                  analogByte2 = analogVal<<6;
+                }
+                
+               }
+
+               
+               break;
+
+               case 1:
+               {
+                //Do Nothing
+               }
+
+               analogByte1 = analogVal>>2;
+               analogByte2 = analogVal<<6;
+                
+               break;
+
+               case 2:
+               {
+                //Do Nothing
+               }
+               analogByte1 = analogVal>>2;
+               analogByte2 = analogVal<<6;
+               break;
+               
+               default:
+               analogByte1 = analogVal>>2;
+               analogByte2 = analogVal<<6;
+               break;
+               }
+                
+                
+                
+              
+              }
+              else{
+                analogByte1 =0;
+                analogByte2 =0;
+              }
+
+              
+              //suppress 2nd byte of analog data if steering options are set to 1 or 3
+              if (cur_steering_options[0]==1 || cur_steering_options[0]==3){
+                 analogByte2 = 0x00;
+              }
+
+              
+              analog_channel_data[i*2] = analogByte1;
+              analog_channel_data[i*2 + 1] = analogByte2;
+            }
+
+            
+
+            //read coins
+            debouncerarray[COIN1].update();
+            if (!debouncerarray[COIN1].read()){
+              //coin++;
+              coin1_state = true;
+            }
+
+            debouncerarray[COIN2].update();
+            if (!debouncerarray[COIN2].read()){
+              //coin2++;
+              coin2_state = true;
+            }
+
+            if (coin1_state == true && debouncerarray[COIN1].read() ){
+              coin1_val++;
+              coin1_state = false;
+            }
+
+            if (coin2_state == true && debouncerarray[COIN2].read() ){
+              coin2_val++;
+              coin2_state = false;
+            }
+
+
+
+            
   }
 
 }

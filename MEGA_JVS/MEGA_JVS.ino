@@ -1,10 +1,10 @@
-char versionNum[9]="v01.01.04";
+char versionNum[9]="v1.1.5";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.1.4 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.1.5 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -491,7 +491,7 @@ byte Output_Pins[8]=
  0,0,OUT2_3,OUT2_2,OUT2_1,OUT1_3,OUT1_2,OUT1_1
 };
 
-byte mainboard_id[255] = {
+byte mainboard_id[99] = {
   0
 };
 
@@ -742,7 +742,7 @@ void setWaitForCommsDisplay()
   u8g.firstPage();
       do {
         u8g.setFont(u8g_font_timB10);
-        u8g.drawStr(32,10,versionNum);
+        u8g.drawStr(50,10,versionNum);
         u8g.drawStr(1,30,"Wait for JVS Comm");
         u8g.drawStr(25,50,"Profile: ");
         u8g.drawStr(75,50, current_profile_name);
@@ -1118,6 +1118,10 @@ void ProcessPacket(struct Packet *p)
               char full_id[]="";
               Serial.print("ID Length is: ");
               Serial.println(IDLength);
+
+              profileID[IDLength]=0;
+              IDLength++;
+              
               //Serial.println("##########");
               //Serial.write(profileID);
               //Serial.println("##########");
@@ -1134,10 +1138,18 @@ void ProcessPacket(struct Packet *p)
               #endif
               int i2=0;
               int id_size = sizeof(full_id);
+              if (id_size>99){id_size=99;}
+              
+              full_id[id_size]=0;
+              id_size++;
+              
+              
+              
               for (int i = id_size-1; i<id_size+8; i++){
                full_id[i]=current_profile_name[i2];
                i2++;
               }
+              
               Serial.println(full_id);
               ReplyBytes((const byte*)full_id, id_size+5);
           }

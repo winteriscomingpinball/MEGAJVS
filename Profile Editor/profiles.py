@@ -1213,12 +1213,12 @@ def updateIdLength():
 
    labelColor = "black"
 
-   if IdLen>0 and IdLen<101:
+   if IdLen>0 and IdLen<100:
       labelColor="green"
-   elif IdLen>100:
+   elif IdLen>99:
       labelColor="red"
       txtIdString.delete('1.0', END)
-      getIdText=getIdText[:100]
+      getIdText=getIdText[:99]
       txtIdString.insert(INSERT, getIdText)
       IdLen=len(getIdText)
       

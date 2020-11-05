@@ -629,6 +629,8 @@ bool USBswitchmode = false;
 
  byte result_p2_1 = 0;
  byte result_p2_2 = 0;
+
+ byte testbuttonstatus = 0;
  
 
 //Function to read a specific profile from SD card.
@@ -738,8 +740,9 @@ void setWaitForCommsDisplay()
       do {
         u8g.setFont(u8g_font_timB10);
         u8g.drawStr(30,10,"Waiting for");
-        u8g.drawStr(50,30,"JVS");
-        u8g.drawStr(15,50,"Communication");
+        u8g.drawStr(30,30,"JVS Comm");
+        u8g.drawStr(25,50,"Profile: ");
+        u8g.drawStr(75,50, current_profile_name);
       } while ( u8g.nextPage() );
       logo_timer = millis();
       logoOn = false;
@@ -1171,8 +1174,9 @@ void ProcessPacket(struct Packet *p)
             
             byte mask = 1;
             
-            byte testbuttonstatus = 0x0;
+            
             if(!USBswitchmode){
+          testbuttonstatus = 0;
           result_p1_1 = 0;
           result_p1_2 = 0;
 
@@ -1674,7 +1678,7 @@ byte serialbuffer[4]={0,0,0,0};
 void loop()
 {
 
-  if (logoOn==false && millis()-logo_timer >5000 && waitForComms==false){
+  if (logoOn==false && millis()-logo_timer >5000 && waitForComms==false && USBswitchmode==false){
     //u8g2.clearDisplay();
     Serial.print("millis():");
     Serial.println(millis());
@@ -1783,7 +1787,7 @@ if (USB_Mode==false){
     profile_i=0;
   }
 
-  if(serialbuffer[0]==0x53 && serialbuffer[1]==0x50 && serialbuffer[2]<=0x04 && profile_i==4){
+  if(serialbuffer[0]==0x53 && serialbuffer[1]==0x50 && serialbuffer[2]<=0x05 && profile_i==4){
     //Code to activate USB switch test mode
     if (USBswitchmode == false){
       u8g.firstPage();
@@ -1803,6 +1807,7 @@ if (USB_Mode==false){
         result_p1_2 = 0;
         result_p2_1 = 0;
         result_p2_2 = 0;
+        testbuttonstatus= 0;
         break;
       case 0x01:
         result_p1_1 ^= serialbuffer[3];
@@ -1816,6 +1821,10 @@ if (USB_Mode==false){
       case 0x04:
         result_p2_2 ^= serialbuffer[3];
         break;
+      case 0x05:
+        testbuttonstatus ^= serialbuffer[3];
+        break;
+        
     }
       
     serialbuffer[0]= 0;

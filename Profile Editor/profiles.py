@@ -60,6 +60,13 @@ digitalinputlist = [
 "OPT_PIN4",
 ]
 
+
+inputoverlaylist=[
+"DEFAULT",
+"OR2",
+"WMMT",
+]
+
 digitalinputdict = {
    "NOT ASSIGNED" : 0,
    "P1_START" : 1,
@@ -96,6 +103,45 @@ digitalinputdict = {
    "OPT_PIN3": 32,
    "OPT_PIN4": 33
    }
+   
+   
+digitalinputoverlaydict = {
+   "NOT ASSIGNED" : "NOT ASSIGNED",
+   "P1_START" : "P1_START",
+   "P1_RIGHT" : "P1_RIGHT",
+   "P1_LEFT": "P1_LEFT",
+   "P1_UP": "P1_UP",
+   "P1_DOWN": "P1_DOWN",
+   "P1_SW1": "P1_SW1",
+   "P1_SW2": "P1_SW2",
+   "P1_SW3": "P1_SW3",
+   "P1_SW4": "P1_SW4",
+   "P1_SW5": "P1_SW5",
+   "P1_SW6": "P1_SW6",
+   "P1_SW7": "P1_SW7",
+   "P1_SERVICE": "P1_SERVICE",
+   "P2_START": "P2_START",
+   "P2_RIGHT": "P2_RIGHT",
+   "P2_LEFT": "P2_LEFT",
+   "P2_UP": "P2_UP",
+   "P2_DOWN": "P2_DOWN",
+   "P2_SW1": "P2_SW1",
+   "P2_SW2": "P2_SW2",
+   "P2_SW3": "P2_SW3",
+   "P2_SW4": "P2_SW4",
+   "P2_SW5": "P2_SW5",
+   "P2_SW6": "P2_SW6",
+   "P2_SW7": "P2_SW7",
+   "P2_SERVICE": "P2_SERVICE",
+   "TEST": "TEST",
+   "COIN1": "COIN1",
+   "COIN2": "COIN2",
+   "OPT_PIN1": "OPT_PIN1",
+   "OPT_PIN2": "OPT_PIN2",
+   "OPT_PIN3": "OPT_PIN3",
+   "OPT_PIN4": "OPT_PIN4"
+   }
+   
 
 analogdict = {
    0  : "NOT ASSIGNED",
@@ -360,6 +406,7 @@ def resetswitches():
       packet = bytes([0x53,0x50,0x00,0x00])
       ser.write(packet)
       
+      lblTEST.configure(text='OFF',fg='black')
       lblP1_START.configure(text='OFF',fg='black')
       lblP1_SERVICE.configure(text='OFF',fg='black')
       lblP1_UP.configure(text='OFF',fg='black')
@@ -994,6 +1041,54 @@ def deleteId():
    updateIdLength()
    
    
+# def selectedinputoverlay(val):
+    
+    # indexval= comboInputOverlay.current()
+    # labelval= comboInputOverlay.get()
+    # print (labelval)
+    
+    # if labelval=="OR2":
+    
+        # digitalinputoverlaydict["P1_DOWN"]="P1_DOWN:TEST"
+        
+        # newlist=[]
+        
+        # for item in digitalinputoverlaydict:
+            # newlist.append(digitalinputoverlaydict[item])
+  
+        # comboP1B1['values']=newlist
+        # comboP1B10['values']=newlist
+        # comboP1B2['values']=newlist
+        # comboP1B3['values']=newlist
+        # comboP1B4['values']=newlist
+        # comboP1B5['values']=newlist
+        # comboP1B6['values']=newlist
+        # comboP1B7['values']=newlist
+        # comboP1B8['values']=newlist
+        # comboP1B9['values']=newlist
+        # comboP1DOWN['values']=newlist
+        # comboP1LEFT['values']=newlist
+        # comboP1RIGHT['values']=newlist
+        # comboP1Service['values']=newlist
+        # comboP1Start['values']=newlist
+        # comboP1UP['values']=newlist
+
+        # comboP2B1['values']=newlist
+        # comboP2B10['values']=newlist
+        # comboP2B2['values']=newlist
+        # comboP2B3['values']=newlist
+        # comboP2B4['values']=newlist
+        # comboP2B5['values']=newlist
+        # comboP2B6['values']=newlist
+        # comboP2B7['values']=newlist
+        # comboP2B8['values']=newlist
+        # comboP2B9['values']=newlist
+        # comboP2DOWN['values']=newlist
+        # comboP2LEFT['values']=newlist
+        # comboP2RIGHT['values']=newlist
+        # comboP2Service['values']=newlist
+        # comboP2Start['values']=newlist
+        # comboP2UP['values']=newlist
 
 def selectedprofile(val):
    
@@ -1161,6 +1256,13 @@ buttonImportProfile = ttk.Button(root, text='Import Profile', command=importprof
 
 buttonDeleteId = ttk.Button(root, text='Delete ID', command=deleteId, width = 20)
 
+#labelInputOverlay= Label(text="Input Overlay:", fg="black",justify=LEFT,anchor=W,width = 15)
+#comboInputOverlay = ttk.Combobox(root)
+#labelInputOverlay.grid(row=1, column=5)
+#comboInputOverlay.grid(row=1, column=6)
+
+
+
 labelChooseProf = Label(text="Choose Profile", fg="black",justify=LEFT,anchor=W,width = 15)
 labelDigitalInputs = Label(text="Digital Inputs:", fg="black",justify=LEFT,anchor=W,width = 15)
 labelAnalogInputs = Label(text="Analog Inputs:", fg="black",justify=LEFT,anchor=W,width = 15)
@@ -1170,6 +1272,12 @@ labelAnalogOptions = Label(text="Analog Options:", fg="black",justify=LEFT,ancho
 
 labelSpecialCase = Label(text="Special Case:", fg="black",justify=LEFT,anchor=W,width = 17)
 comboSpecialCase = ttk.Combobox(root)
+
+
+
+
+
+
 
 labelId = Label(text="ID String \n(100 char max):", fg="black",justify=LEFT,anchor=W,width = 17)
 comboSpecialCase = ttk.Combobox(root)
@@ -1464,6 +1572,8 @@ buttonDeleteId.grid(row=43, column=3, pady=20)
 labelIdStringLength.grid(row=43, column=2)
    
 comboSpecialCase.state(['readonly'])
+
+#comboInputOverlay.state(['readonly'])
    
 comboP1B1.state(['readonly'])
 comboP1B10.state(['readonly'])
@@ -1570,6 +1680,9 @@ comboOut2_3['values']=outputlist
 comboAnalogOpts['values']=analogoptionslist
 
 comboSpecialCase['values']=specialcaselist
+#comboInputOverlay['values']=inputoverlaylist
+#comboInputOverlay.current(newindex=0)
+#comboInputOverlay.bind('<<ComboboxSelected>>', selectedinputoverlay)
 
 profilemanagerwindow = Toplevel()
 profilemanagerwindow.title("MEGA JVS PROFILE MANAGER")
@@ -1597,6 +1710,11 @@ labeldirections.grid(row=3,column=0)
 
 buttonresetswitches = ttk.Button(switchtestwindow, text='Reset Switches', command=resetswitches, width = 20)
 buttonresetswitches.grid(row=3,column=1)
+
+buttontestmode = ttk.Button(switchtestwindow, text='TEST', command=lambda: sendswitchserial(0x05,0x80,lblTEST), width = 20)
+buttontestmode.grid(row=3,column=3)
+lblTEST=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+lblTEST.grid(row=3,column=4)
 
 buttonswtstP1_START = ttk.Button(switchtestwindow, text='P1_START', command= lambda: sendswitchserial(0x01,0x80,lblP1_START) , width = 20)
 buttonswtstP1_SERVICE = ttk.Button(switchtestwindow, text='P1_SERVICE', command= lambda: sendswitchserial(0x01,0x40,lblP1_SERVICE) , width = 20)

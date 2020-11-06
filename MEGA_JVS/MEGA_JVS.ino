@@ -1,10 +1,10 @@
-char versionNum[9]="v1.1.5";
+char versionNum[9]="v1.1.6";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.1.5 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.1.6 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -259,7 +259,7 @@ struct Reply
   byte message[255];
 };
 
-byte profileID[100];
+byte profileID[99];
 bool profileIDSet = false;
 byte IDLength = 0;
 
@@ -565,7 +565,7 @@ void SDLookupIDString(){
         IDLength=myFile.read();
         Serial.print("ID Length is: ");
         Serial.println(IDLength);
-        memset(profileID, 0, 100);
+        memset(profileID, 0, 99);
         myFile.read(profileID, IDLength);
         profileIDSet = true;
         Serial.println("ID found!");
@@ -1071,7 +1071,8 @@ void Resend()
 
 uint16_t coinModifier = 0;
 byte slotNum =0;
-
+byte IDSent=0;
+byte featuresSent=0;
 
 
 void ProcessPacket(struct Packet *p)
@@ -1114,46 +1115,54 @@ void ProcessPacket(struct Packet *p)
         case CMD_READID:
         {
           Serial.println("CMD_READID");
+          char *pIdStr = NULL;
+          char *pProfileId = "1.3.5";  
+          byte outBuf[102] = { 0 };
+          int id_size=0;
+          
           if (profileIDSet){
-              char full_id[]="";
+              
               Serial.print("ID Length is: ");
               Serial.println(IDLength);
 
-              profileID[IDLength]=0;
-              IDLength++;
-              
-              //Serial.println("##########");
-              //Serial.write(profileID);
-              //Serial.println("##########");
-              ReplyBytes((const byte*)profileID, IDLength);
+              //pProfileId = profileID;
+
+              memcpy(outBuf, (const byte*)profileID,IDLength); 
+              id_size=IDLength+1;
           }
           else{
               #if defined(__AVR_ATmega2560__)
               char full_id[]="MEGA JVS;I/O BD JVS;MEGA 2560 Version;Profile:";
               //char full_id[]="SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551 ;Ver1.00;98/10";
               //char full_id[]=  "SEGA CORPORATION;I/O BD JVS;837-14572;Ver1.00;2005/10";
+              
               #endif
               #if defined (_VARIANT_ARDUINO_DUE_X_)
               char full_id[]="MEGA JVS;I/O BD JVS;DUE Version;Profile:";
               #endif
               int i2=0;
-              int id_size = sizeof(full_id);
-              if (id_size>99){id_size=99;}
-              
-              full_id[id_size]=0;
-              id_size++;
-              
-              
+              id_size = sizeof(full_id);
               
               for (int i = id_size-1; i<id_size+8; i++){
                full_id[i]=current_profile_name[i2];
                i2++;
               }
+              id_size+=i2;
+              //pProfileId=full_id;
               
-              Serial.println(full_id);
-              ReplyBytes((const byte*)full_id, id_size+5);
-          }
+              memcpy(outBuf, full_id,id_size); 
 
+              
+              
+          }
+          //id_size = strlen(outBuf) + 1;
+          ReplyBytes(outBuf, id_size);
+          
+          IDSent=1;
+          if (IDSent==1 && featuresSent==1){
+            waitForComms=false;
+          }
+          //Serial.println(outBuf);
           
           
           
@@ -1161,6 +1170,7 @@ void ProcessPacket(struct Packet *p)
           
           break;
         }
+        
         case CMD_FORMATVERSION:
           Serial.println("CMD_FORMATVERSION");
           ReplyByte(0x13);
@@ -1178,7 +1188,10 @@ void ProcessPacket(struct Packet *p)
         case CMD_GETFEATURES:
           Serial.println("CMD_GETFEATURES");
           ReplyBytes(features, sizeof(features));
-          waitForComms=false;
+          featuresSent=1;
+          if (IDSent==1 && featuresSent==1){
+            waitForComms=false;
+          }
           break;
         case CMD_SETMAINBOARDID:
           {

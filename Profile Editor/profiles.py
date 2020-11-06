@@ -1279,7 +1279,7 @@ comboSpecialCase = ttk.Combobox(root)
 
 
 
-labelId = Label(text="ID String \n(100 char max):", fg="black",justify=LEFT,anchor=W,width = 17)
+labelId = Label(text="ID String \n(99 char max):", fg="black",justify=LEFT,anchor=W,width = 17)
 comboSpecialCase = ttk.Combobox(root)
 
 labelStatus = Label(text="", fg="black",justify=LEFT,anchor=W,width = 17)

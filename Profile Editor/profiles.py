@@ -1213,12 +1213,12 @@ def updateIdLength():
 
    labelColor = "black"
 
-   if IdLen>0 and IdLen<100:
+   if IdLen>0 and IdLen<101:
       labelColor="green"
-   elif IdLen>99:
+   elif IdLen>100:
       labelColor="red"
       txtIdString.delete('1.0', END)
-      getIdText=getIdText[:99]
+      getIdText=getIdText[:100]
       txtIdString.insert(INSERT, getIdText)
       IdLen=len(getIdText)
       
@@ -1279,7 +1279,7 @@ comboSpecialCase = ttk.Combobox(root)
 
 
 
-labelId = Label(text="ID String \n(99 char max):", fg="black",justify=LEFT,anchor=W,width = 17)
+labelId = Label(text="ID String \n(100 char max):", fg="black",justify=LEFT,anchor=W,width = 17)
 comboSpecialCase = ttk.Combobox(root)
 
 labelStatus = Label(text="", fg="black",justify=LEFT,anchor=W,width = 17)

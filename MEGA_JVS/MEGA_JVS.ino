@@ -1,15 +1,16 @@
-char versionNum[9]="v1.1.6";
+char versionNum[9]="v1.1.7";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.1.6 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.1.7 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
 //TeensyJVS code was used with permission by the author.
 //MEGA JVS code by winteriscoming.
+//Special thanks to Darksoft and rtw.
 
 //Not to be used for commmercial purposes.  Only private use is permitted.
 //No warranty is given.  Use at your own risk.
@@ -259,7 +260,7 @@ struct Reply
   byte message[255];
 };
 
-byte profileID[99];
+byte profileID[100];
 bool profileIDSet = false;
 byte IDLength = 0;
 
@@ -451,7 +452,7 @@ byte features[] =
   1, 2, 13, 0,    // Players=2 Switches=13
   2, 2, 0, 0,   // 2 coin slot
   3, 8, 0, 0,   // 8 analog channels - 0(unknown) bits
-  18, 6, 0, 0,  // 20 GPIO outputs
+  18, 6, 0, 0,  // 6 GPIO outputs
   0       // End of features
 };
 
@@ -491,9 +492,7 @@ byte Output_Pins[8]=
  0,0,OUT2_3,OUT2_2,OUT2_1,OUT1_3,OUT1_2,OUT1_1
 };
 
-byte mainboard_id[99] = {
-  0
-};
+
 
 boolean initialized = false;
 
@@ -565,7 +564,7 @@ void SDLookupIDString(){
         IDLength=myFile.read();
         Serial.print("ID Length is: ");
         Serial.println(IDLength);
-        memset(profileID, 0, 99);
+        memset(profileID, 0, 100);
         myFile.read(profileID, IDLength);
         profileIDSet = true;
         Serial.println("ID found!");
@@ -1103,10 +1102,16 @@ void ProcessPacket(struct Packet *p)
           
         case CMD_SETADDRESS:
           sz = 2;
-          digitalWrite(PIN_SENSE, HIGH);
+          
           deviceId = message[1];
-          Reply();
+          
           Serial.println("CMD_SETADDRESS");
+          Serial.print("Address is: ");
+          Serial.println(deviceId);
+          digitalWrite(PIN_SENSE, HIGH); 
+          Reply();
+          
+          
           break;
     
         case CMD_SETMETHOD:
@@ -1117,7 +1122,7 @@ void ProcessPacket(struct Packet *p)
           Serial.println("CMD_READID");
           char *pIdStr = NULL;
           char *pProfileId = "1.3.5";  
-          byte outBuf[102] = { 0 };
+          char outBuf[102] = { 0 };
           int id_size=0;
           
           if (profileIDSet){
@@ -1127,7 +1132,7 @@ void ProcessPacket(struct Packet *p)
 
               //pProfileId = profileID;
 
-              memcpy(outBuf, (const byte*)profileID,IDLength); 
+              strcpy(outBuf, profileID); 
               id_size=IDLength+1;
           }
           else{
@@ -1148,9 +1153,10 @@ void ProcessPacket(struct Packet *p)
                i2++;
               }
               id_size+=i2;
+              id_size++;
               //pProfileId=full_id;
               
-              memcpy(outBuf, full_id,id_size); 
+              strcpy(outBuf, full_id); 
 
               
               
@@ -1158,10 +1164,10 @@ void ProcessPacket(struct Packet *p)
           //id_size = strlen(outBuf) + 1;
           ReplyBytes(outBuf, id_size);
           
-          IDSent=1;
-          if (IDSent==1 && featuresSent==1){
-            waitForComms=false;
-          }
+          //IDSent=1;
+          //if (IDSent==1 && featuresSent==1){
+          //  waitForComms=false;
+          //}
           //Serial.println(outBuf);
           
           
@@ -1186,13 +1192,15 @@ void ProcessPacket(struct Packet *p)
           ReplyByte(0x10);
           break;
         case CMD_GETFEATURES:
+          {
           Serial.println("CMD_GETFEATURES");
-          ReplyBytes(features, sizeof(features));
-          featuresSent=1;
-          if (IDSent==1 && featuresSent==1){
-            waitForComms=false;
-          }
+          ReplyBytes(features, 17);
+          //featuresSent=1;
+          //if (IDSent==1 && featuresSent==1){
+          //  waitForComms=false;
+          //}
           break;
+          }
         case CMD_SETMAINBOARDID:
           {
           Serial.println("CMD_SETMAINBOARDID");
@@ -1205,6 +1213,7 @@ void ProcessPacket(struct Packet *p)
         case CMD_READSWITCHES:
           {
             sz = 3;
+            waitForComms=false;
             
             byte results[5];
             

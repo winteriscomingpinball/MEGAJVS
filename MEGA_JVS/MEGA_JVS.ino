@@ -1,10 +1,10 @@
-char versionNum[9]="v1.1.9";
+char versionNum[9]="v1.2.0";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.1.9 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.2.0 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -72,8 +72,11 @@ Bounce * debouncerarray = new Bounce[34];
 
 //U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0,U8X8_PIN_NONE);
 
-U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NO_ACK);
+//use this for MEGA JVS
+//U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NO_ACK);
 
+//use this for Multi JVS
+U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NO_ACK);
 
 //MEGA JVS Bitmap
 uint8_t pic_Logo_bmp[] = {
@@ -510,13 +513,15 @@ void showlogo(){
 
   u8g.firstPage();
   do {
-    u8g.drawBitmap(0,0,16,64,pic_Logo_bmp);
+    u8g.drawBitmap(-2,0,16,64,pic_Logo_bmp);
     //u8g.drawBitmapP(0,0,16,64,pic_Logo_bmp);
 
     //u8g.setFont(u8g_font_u8glib_4);
     //u8g.setFont(u8g_font_5x8);
-    u8g.setFont(u8g_font_helvR08);
-    u8g.drawStr(96,56,current_profile_name);
+    //u8g.setFont(u8g_font_helvR08);
+    //u8g.setFont(u8g_font_7x14B);
+    u8g.setFont(u8g_font_timB10);
+    u8g.drawStr(90,56,current_profile_name);
   } while ( u8g.nextPage() );
 
 }
@@ -897,7 +902,7 @@ void setup()
 
   logo_timer = millis();
   logoOn = false;
-
+  
   setWaitForCommsDisplay();
 
 }

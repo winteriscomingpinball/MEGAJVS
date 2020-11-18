@@ -1,10 +1,10 @@
-char versionNum[9]="v1.1.7";
+char versionNum[9]="v1.1.8";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.1.7 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.1.8 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -1120,15 +1120,13 @@ void ProcessPacket(struct Packet *p)
         case CMD_READID:
         {
           Serial.println("CMD_READID");
-          char *pIdStr = NULL;
-          char *pProfileId = "1.3.5";  
           char outBuf[102] = { 0 };
           int id_size=0;
           
           if (profileIDSet){
               
-              Serial.print("ID Length is: ");
-              Serial.println(IDLength);
+              //Serial.print("ID Length is: ");
+              //Serial.println(IDLength);
 
               //pProfileId = profileID;
 
@@ -1137,22 +1135,22 @@ void ProcessPacket(struct Packet *p)
           }
           else{
               #if defined(__AVR_ATmega2560__)
-              char full_id[]="MEGA JVS;I/O BD JVS;MEGA 2560 Version;Profile:";
+              char full_id[]="MEGA JVS;I/O BD JVS;MEGA 2560 Version";
               //char full_id[]="SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551 ;Ver1.00;98/10";
               //char full_id[]=  "SEGA CORPORATION;I/O BD JVS;837-14572;Ver1.00;2005/10";
               
               #endif
               #if defined (_VARIANT_ARDUINO_DUE_X_)
-              char full_id[]="MEGA JVS;I/O BD JVS;DUE Version;Profile:";
+              char full_id[]="MEGA JVS;I/O BD JVS;DUE Version";
               #endif
-              int i2=0;
+              //int i2=0;
               id_size = sizeof(full_id);
               
-              for (int i = id_size-1; i<id_size+8; i++){
-               full_id[i]=current_profile_name[i2];
-               i2++;
-              }
-              id_size+=i2;
+              //for (int i = id_size-1; i<id_size+8; i++){
+              // full_id[i]=current_profile_name[i2];
+              // i2++;
+              //}
+              //id_size+=i2;
               id_size++;
               //pProfileId=full_id;
               

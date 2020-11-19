@@ -1795,14 +1795,14 @@ comboAnalogOpts.state(['readonly'])
 
 labelAnalogMin.grid(row=38+7,column=0)
 txtAnalogMin.grid(row=38+7,column=1)
-labelAnalogMax.grid(row=38+7,column=2)
-txtAnalogMax.grid(row=38+7,column=3)
+labelAnalogMax.grid(row=38+7,column=3)
+txtAnalogMax.grid(row=38+7,column=4)
 
 #ScaleAnalogMin.grid(row=38,column=2)
 #ScaleAnalogMax.grid(row=38,column=5)
 
 labelActualMin.grid(row=37+7,column=1, pady=10)
-labelActualMax.grid(row=37+7,column=3, pady=10)
+labelActualMax.grid(row=37+7,column=4, pady=10)
 
 
 labelSpecialCase.grid(row=40+7,column=0, pady=20)
@@ -1810,9 +1810,9 @@ comboSpecialCase.grid(row=40+7,column=1)
 
 labelId.grid(row=43+5,column=0, pady=20)
 txtIdString.grid(row=43+5, column=1, pady=20)
-buttonDeleteId.grid(row=43+5, column=3, pady=20)
+buttonDeleteId.grid(row=43+5, column=4, pady=20)
 
-labelIdStringLength.grid(row=43+5, column=2)
+labelIdStringLength.grid(row=43+5, column=3)
    
 comboSpecialCase.state(['readonly'])
 

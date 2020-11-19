@@ -1,10 +1,10 @@
-char versionNum[9]="v1.2.1";
+char versionNum[9]="v1.2.2";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.2.1 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.2.2 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -1150,15 +1150,16 @@ void ProcessPacket(struct Packet *p)
 
           if (deviceId==-1){
             deviceId = message[1];
-          }
+            Reply();
+          }//else{
+
+            //ReplyByte(0x03);
+          //}
           
           Serial.println("CMD_SETADDRESS");
           Serial.print("Address is: ");
           Serial.println(deviceId);
-          digitalWrite(PIN_SENSE, HIGH); 
-          Reply();
-          
-          
+          digitalWrite(PIN_SENSE, HIGH);
           break;
     
         case CMD_SETMETHOD:

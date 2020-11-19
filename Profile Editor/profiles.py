@@ -7,7 +7,7 @@ import struct
 
 IdInfo=bytearray(0);
 
-profilearray = bytearray(62)
+profilearray = bytearray(80)
 profilelist=[]
 IdDict={}
 profilecount=0
@@ -181,32 +181,32 @@ analoglist = [
 
 outputlist = [
    "NOT ASSIGNED",
-   "Out1_1",
-   "Out1_2",
-   "Out1_3",
-   "Out2_1",
-   "Out2_2",
-   "Out2_3"
+   "Out1 (1_1)",
+   "Out2 (1_2)",
+   "Out3 (1_3)",
+   "Out4 (2_1)",
+   "Out5 (2_2)",
+   "Out6 (2_3)"
    ]
 
 outputdict = {
    0  : "NOT ASSIGNED",
-   33 : "Out1_1",
-   37 : "Out1_2",
-   41 : "Out1_3",
-   35 : "Out2_1",
-   39 : "Out2_2",
-   43 : "Out2_3"
+   33 : "Out1 (1_1)",
+   37 : "Out2 (1_2)",
+   41 : "Out3 (1_3)",
+   35 : "Out4 (2_1)",
+   39 : "Out5 (2_2)",
+   43 : "Out6 (2_3)"
    }
 
 outputreversedict = {
    "NOT ASSIGNED" : 0,
-   "Out1_1" : 33,
-   "Out1_2" : 37,
-   "Out1_3" : 41,
-   "Out2_1" : 35,
-   "Out2_2" : 39,
-   "Out2_3" : 43
+   "Out1 (1_1)" : 33,
+   "Out2 (1_2)" : 37,
+   "Out3 (1_3)" : 41,
+   "Out4 (2_1)" : 35,
+   "Out5 (2_2)" : 39,
+   "Out6 (2_3)" : 43
    }
 
 analogoptionslist= ["0 - NONE","1 - SUPPRESS 2ND BYTE","2 - SCALE STEERING" ,"3 - SCALE & SUPPRESS"]
@@ -245,11 +245,11 @@ def openprofiles():
    f.seek(0, 2)
    bytecount = f.tell()
    global profilecount
-   profilecount = bytecount/62
+   profilecount = bytecount/80
    i=0
    if profilecount > 0:
       while i<profilecount:
-         f.seek(i*62+0x30)
+         f.seek(i*80+0x30)
          profilelist.append(f.read(4))
          i+=1;
          
@@ -258,7 +258,7 @@ def openprofiles():
    print("byte count")
    print(bytecount)
    print("profile count:")
-   profilecount = int(bytecount/62)
+   profilecount = int(bytecount/80)
    print(int(profilecount))
    print("List of profiles:")
    print(profilelist)
@@ -325,17 +325,17 @@ def reopenprofiles():
    f.seek(0, 2)
    bytecount = f.tell()
    global profilecount
-   profilecount = bytecount/62
+   profilecount = bytecount/80
    i=0
    if profilecount > 0:
       while i<profilecount:
-         f.seek(i*62+0x30)
+         f.seek(i*80+0x30)
          profilelist.append(f.read(4))
          i+=1;
          
    f.close()
    print("profile count:")
-   profilecount = int(bytecount/62)
+   profilecount = int(bytecount/80)
    
    comboProfiles['values']=profilelist
    comboProfiles.current(newindex=savedindex)
@@ -382,7 +382,7 @@ def importprofile():
          bytecount=1
          i=0
          #write import file to end of profiles file
-         while i<62:
+         while i<80:
             f.write(f2.read(1))
             i +=1
                
@@ -557,7 +557,41 @@ def exportprofile():
       specialcasereversedict
       f.write(specialcasereversedict[comboSpecialCase.get()].to_bytes(1,byteorder='little'))
 
+      #write smoothing count - not used
       f.write(byteval.to_bytes(1,byteorder='little'))
+      
+      #write 2 bytes of coins
+      
+      f.write(digitalinputdict[comboCoin1.get()].to_bytes(1,byteorder='little'))
+      f.write(digitalinputdict[comboCoin2.get()].to_bytes(1,byteorder='little'))
+      
+      #write 8 bytes if outputs 2
+      
+      
+      f.write(outputreversedict[comboOut16.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut15.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut14.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut13.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut12.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut11.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut10.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut9.get()].to_bytes(1,byteorder='little'))
+      
+      #write 8 bytes of outputs 3
+      f.write(byteval.to_bytes(1,byteorder='little'))
+      f.write(byteval.to_bytes(1,byteorder='little'))
+      
+      f.write(outputreversedict[comboOut22.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut21.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut20.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut19.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut18.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut17.get()].to_bytes(1,byteorder='little'))
+      
+      
+      
+      
+
       f.close()
       
       labelStatus.configure(fg="green",text="Profile exported.")
@@ -583,7 +617,7 @@ def saveprofile():
       indexval= comboProfiles.current()
       savedindex=indexval
       
-      f.seek(indexval*62+0x00)
+      f.seek(indexval*80+0x00)
 
       #write digital inputs
       f.write(digitalinputdict[comboP1B2.get()].to_bytes(1,byteorder='little'))
@@ -631,8 +665,8 @@ def saveprofile():
 
       #write outputs
       byteval=0
-      f.write(byteval.to_bytes(1,byteorder='little'))
-      f.write(byteval.to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut8.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut7.get()].to_bytes(1,byteorder='little'))
       f.write(outputreversedict[comboOut2_3.get()].to_bytes(1,byteorder='little'))
       f.write(outputreversedict[comboOut2_2.get()].to_bytes(1,byteorder='little'))
       f.write(outputreversedict[comboOut2_1.get()].to_bytes(1,byteorder='little'))
@@ -676,7 +710,40 @@ def saveprofile():
       specialcasereversedict
       f.write(specialcasereversedict[comboSpecialCase.get()].to_bytes(1,byteorder='little'))
 
+      #write smoothing count - not used
       f.write(byteval.to_bytes(1,byteorder='little'))
+      
+      #write 2 bytes of coins
+      
+      f.write(digitalinputdict[comboCoin1.get()].to_bytes(1,byteorder='little'))
+      f.write(digitalinputdict[comboCoin2.get()].to_bytes(1,byteorder='little'))
+      
+      #write 8 bytes if outputs 2
+      
+      
+      f.write(outputreversedict[comboOut16.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut15.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut14.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut13.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut12.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut11.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut10.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut9.get()].to_bytes(1,byteorder='little'))
+      
+      #write 8 bytes of outputs 3
+      f.write(byteval.to_bytes(1,byteorder='little'))
+      f.write(byteval.to_bytes(1,byteorder='little'))
+      
+      f.write(outputreversedict[comboOut22.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut21.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut20.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut19.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut18.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut17.get()].to_bytes(1,byteorder='little'))
+      
+      
+      
+      
 
       f.close()
 
@@ -729,7 +796,7 @@ def addprofile():
       savedindex=indexval
       
 
-      f.seek(indexval*62+0x00)
+      f.seek(indexval*80+0x00)
 
       #write digital inputs
       f.write(digitalinputdict[comboP1B2.get()].to_bytes(1,byteorder='little'))
@@ -822,7 +889,40 @@ def addprofile():
       specialcasereversedict
       f.write(specialcasereversedict[comboSpecialCase.get()].to_bytes(1,byteorder='little'))
 
+      #write smoothing count - not used
       f.write(byteval.to_bytes(1,byteorder='little'))
+      
+      #write 2 bytes of coins
+      
+      f.write(digitalinputdict[comboCoin1.get()].to_bytes(1,byteorder='little'))
+      f.write(digitalinputdict[comboCoin2.get()].to_bytes(1,byteorder='little'))
+      
+      #write 8 bytes if outputs 2
+      
+      
+      f.write(outputreversedict[comboOut16.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut15.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut14.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut13.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut12.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut11.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut10.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut9.get()].to_bytes(1,byteorder='little'))
+      
+      #write 8 bytes of outputs 3
+      f.write(byteval.to_bytes(1,byteorder='little'))
+      f.write(byteval.to_bytes(1,byteorder='little'))
+      
+      f.write(outputreversedict[comboOut22.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut21.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut20.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut19.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut18.get()].to_bytes(1,byteorder='little'))
+      f.write(outputreversedict[comboOut17.get()].to_bytes(1,byteorder='little'))
+      
+      
+      
+      
 
       f.close()
       reopenprofiles()
@@ -910,10 +1010,10 @@ def switchtestclosing():
 def deleteprofileatindex(index,size):
    global filename
    f = open(filename,'r+b')
-   f.seek((index+1)*62)
+   f.seek((index+1)*80)
    #profiledata = f.read((size-1)*62)
    profiledata = f.read()
-   f.seek(index*62)
+   f.seek(index*80)
    f.write(profiledata)
    #f.seek((size-1)*62)
    f.truncate()
@@ -952,13 +1052,13 @@ def moveprofileup():
       listboxprofiles.see(index-1)
       #add code to manage profile movement up
       f = open(filename,'r+b')
-      f.seek((index)*62)
-      shiftedprofile = f.read(62)
-      f.seek((index-1)*62)
+      f.seek((index)*80)
+      shiftedprofile = f.read(80)
+      f.seek((index-1)*80)
       profiledata = f.read()
-      f.seek(index*62)
+      f.seek(index*80)
       f.write(profiledata)
-      f.seek((index-1)*62)
+      f.seek((index-1)*80)
       f.write(shiftedprofile)
       f.close()
       deleteprofileatindex(index+1,size+1)
@@ -1002,14 +1102,14 @@ def moveprofiledown():
       
       #add code to manage profile movement down
       f = open(filename,'r+b')
-      f.seek((index)*62)
-      shiftedprofile = f.read(62)
-      f.seek((index+1)*62)
+      f.seek((index)*80)
+      shiftedprofile = f.read(80)
+      f.seek((index+1)*80)
       #profiledata = f.read((size-1)*62)
       profiledata = f.read()
-      f.seek((index+2)*62)
+      f.seek((index+2)*80)
       f.write(profiledata)
-      f.seek((index+2)*62)
+      f.seek((index+2)*80)
       f.write(shiftedprofile)
       f.close()
       deleteprofileatindex(index,size+1)
@@ -1107,7 +1207,7 @@ def selectedprofile(val):
    labelCurrentProfNum['text'] = "Profile " + str(indexval+1) + " of " + str(profilecount)
    f = open(filename,'rb')
    
-   f.seek(indexval*62+0x00)
+   f.seek(indexval*80+0x00)
    comboP1B2.set(digitalinputlist[int.from_bytes(f.read(1),"big")])
    comboP1B1.set(digitalinputlist[int.from_bytes(f.read(1),"big")])
    comboP1RIGHT.set(digitalinputlist[int.from_bytes(f.read(1),"big")])
@@ -1153,15 +1253,43 @@ def selectedprofile(val):
    comboA6.set(analogdict[int.from_bytes(f.read(1),"big")])
    comboA7.set(analogdict[int.from_bytes(f.read(1),"big")])
 
-   f.seek(indexval*62+0x2A)
+   f.seek(indexval*80+0x28)
+   comboOut8.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut7.set(outputdict[int.from_bytes(f.read(1),"big")])
    comboOut2_3.set(outputdict[int.from_bytes(f.read(1),"big")])
    comboOut2_2.set(outputdict[int.from_bytes(f.read(1),"big")])
    comboOut2_1.set(outputdict[int.from_bytes(f.read(1),"big")])
    comboOut1_3.set(outputdict[int.from_bytes(f.read(1),"big")])
    comboOut1_2.set(outputdict[int.from_bytes(f.read(1),"big")])
    comboOut1_1.set(outputdict[int.from_bytes(f.read(1),"big")])
-
-   f.seek(indexval*62+0x35)
+   
+   
+   f.seek(indexval*80+0x40-2)
+   comboCoin1.set(digitalinputlist[int.from_bytes(f.read(1),"big")])
+   comboCoin2.set(digitalinputlist[int.from_bytes(f.read(1),"big")])
+   
+   
+   f.seek(indexval*80+0x40)
+   comboOut16.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut15.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut14.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut13.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut12.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut11.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut10.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut9.set(outputdict[int.from_bytes(f.read(1),"big")])
+   
+   f.seek(indexval*80+0x40+10)
+   comboOut22.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut21.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut20.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut19.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut18.set(outputdict[int.from_bytes(f.read(1),"big")])
+   comboOut17.set(outputdict[int.from_bytes(f.read(1),"big")])
+   
+   
+   
+   f.seek(indexval*80+0x35)
    txtOutputCount.delete(0,END)
    txtOutputCount.insert(0,int.from_bytes(f.read(1),"big"))
 
@@ -1231,10 +1359,13 @@ def updateIdLength():
 
 root = Tk()
 
+
 menubar = Menu(root)
 root.config(menu=menubar)
 root.wm_title("MEGA JVS PROFILE EDITOR")
-root.geometry('{}x{}'.format(940, 1000))
+root.geometry('{}x{}'.format(1200, 1200))
+
+
 
 submenu = Menu(menubar,tearoff=0)
 menubar.add_cascade(label="File",menu=submenu);
@@ -1260,7 +1391,6 @@ buttonDeleteId = ttk.Button(root, text='Delete ID', command=deleteId, width = 20
 #comboInputOverlay = ttk.Combobox(root)
 #labelInputOverlay.grid(row=1, column=5)
 #comboInputOverlay.grid(row=1, column=6)
-
 
 
 labelChooseProf = Label(text="Choose Profile", fg="black",justify=LEFT,anchor=W,width = 15)
@@ -1295,6 +1425,13 @@ comboProfiles = ttk.Combobox(root)
 #comboProfiles.current(newindex=0)
 comboProfiles.bind('<<ComboboxSelected>>', selectedprofile)
 comboProfiles.state(['readonly'])
+
+labelCoin1 = Label(text="Coin 1", fg="black",justify=RIGHT,anchor=E,width = 15)
+comboCoin1 = ttk.Combobox(root)
+
+labelCoin2 = Label(text="Coin 2", fg="black",justify=RIGHT,anchor=E,width = 15)
+comboCoin2 = ttk.Combobox(root)
+
 
 labelP1UP = Label(text="P1 - UP", fg="black",justify=RIGHT,anchor=E,width = 15)
 comboP1UP = ttk.Combobox(root)
@@ -1383,12 +1520,37 @@ comboA6=ttk.Combobox(root)
 labelA7=Label(text="A7", fg = "black",justify=RIGHT,anchor=E,width = 15)
 comboA7=ttk.Combobox(root)
 
-labelOut1_1=Label(text="Out1_1", fg = "black",justify=RIGHT,anchor=E,width = 15)
-labelOut1_2=Label(text="Out1_2", fg = "black",justify=RIGHT,anchor=E,width = 15)
-labelOut1_3=Label(text="Out1_3", fg = "black",justify=RIGHT,anchor=E,width = 15)
-labelOut2_1=Label(text="Out2_1", fg = "black",justify=RIGHT,anchor=E,width = 15)
-labelOut2_2=Label(text="Out2_2", fg = "black",justify=RIGHT,anchor=E,width = 15)
-labelOut2_3=Label(text="Out2_3", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut1_1=Label(text="Out1 (1_1)", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut1_2=Label(text="Out2 (1_2)", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut1_3=Label(text="Out3 (1_3)", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut2_1=Label(text="Out4 (2_1)", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut2_2=Label(text="Out5 (2_2)", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut2_3=Label(text="Out6 (2_3)", fg = "black",justify=RIGHT,anchor=E,width = 15)
+
+labelOut7=Label(text="Out7", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut8=Label(text="Out8", fg = "black",justify=RIGHT,anchor=E,width = 15)
+
+labelOut9=Label(text="Out9", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut10=Label(text="Out10", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut11=Label(text="Out11", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut12=Label(text="Out12", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut13=Label(text="Out13", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut14=Label(text="Out14", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut15=Label(text="Out15", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut16=Label(text="Out16", fg = "black",justify=RIGHT,anchor=E,width = 15)
+
+
+labelOut17=Label(text="Out17", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut18=Label(text="Out18", fg = "black",justify=RIGHT,anchor=E,width = 15)
+
+labelOut19=Label(text="Out19", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut20=Label(text="Out20", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut21=Label(text="Out21", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut22=Label(text="Out22", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut23=Label(text="Out23", fg = "black",justify=RIGHT,anchor=E,width = 15)
+labelOut24=Label(text="Out24", fg = "black",justify=RIGHT,anchor=E,width = 15)
+
+
 
 comboOut1_1=ttk.Combobox(root)
 comboOut1_2=ttk.Combobox(root)
@@ -1396,6 +1558,25 @@ comboOut1_3=ttk.Combobox(root)
 comboOut2_1=ttk.Combobox(root)
 comboOut2_2=ttk.Combobox(root)
 comboOut2_3=ttk.Combobox(root)
+
+comboOut7=ttk.Combobox(root)
+comboOut8=ttk.Combobox(root)
+comboOut9=ttk.Combobox(root)
+comboOut10=ttk.Combobox(root)
+comboOut11=ttk.Combobox(root)
+comboOut12=ttk.Combobox(root)
+comboOut13=ttk.Combobox(root)
+comboOut14=ttk.Combobox(root)
+comboOut15=ttk.Combobox(root)
+comboOut16=ttk.Combobox(root)
+comboOut17=ttk.Combobox(root)
+comboOut18=ttk.Combobox(root)
+comboOut19=ttk.Combobox(root)
+comboOut20=ttk.Combobox(root)
+comboOut21=ttk.Combobox(root)
+comboOut22=ttk.Combobox(root)
+comboOut23=ttk.Combobox(root)
+comboOut24=ttk.Combobox(root)
 
 txtOutputCount = Entry(root)
 
@@ -1444,8 +1625,18 @@ labelP1Service.grid(row=5, column=0)
 comboP1Service.grid(row=5, column=1)
 labelP1UP.grid(row=6, column=0)
 comboP1UP.grid(row=6, column=1)
+
+
+labelCoin1.grid(row=4, column=5)
+comboCoin1.grid(row=4, column=6)
+
 labelP1DOWN.grid(row=7, column=0)
 comboP1DOWN.grid(row=7, column=1)
+
+labelCoin2.grid(row=5, column=5)
+comboCoin2.grid(row=5, column=6)
+
+
 labelP1LEFT.grid(row=8, column=0)
 comboP1LEFT.grid(row=8, column=1)
 labelP1RIGHT.grid(row=9, column=0)
@@ -1528,48 +1719,100 @@ comboA7.grid(row=26, column=4)
 
 
 labelOutputs.grid(row=28, column=0)
+
 labelOut1_1.grid(row=29, column=0)
 labelOut1_2.grid(row=30, column=0)
 labelOut1_3.grid(row=31, column=0)
-labelOut2_1.grid(row=29, column=3)
-labelOut2_2.grid(row=30, column=3)
-labelOut2_3.grid(row=31, column=3)
+#labelOut2_1.grid(row=29, column=3)
+#labelOut2_2.grid(row=30, column=3)
+#labelOut2_3.grid(row=31, column=3)
+
+labelOut2_1.grid(row=32, column=0)
+labelOut2_2.grid(row=33, column=0)
+labelOut2_3.grid(row=34, column=0)
+
+labelOut7.grid(row=35, column=0)
+labelOut8.grid(row=36, column=0)
+
+
+labelOut9.grid(row=29, column=3)
+labelOut10.grid(row=30, column=3)
+labelOut11.grid(row=31, column=3)
+labelOut12.grid(row=32, column=3)
+labelOut13.grid(row=33, column=3)
+labelOut14.grid(row=34, column=3)
+labelOut15.grid(row=35, column=3)
+labelOut16.grid(row=36, column=3)
+
+labelOut17.grid(row=29, column=5)
+labelOut18.grid(row=30, column=5)
+labelOut19.grid(row=31, column=5)
+labelOut20.grid(row=32, column=5)
+labelOut21.grid(row=33, column=5)
+labelOut22.grid(row=34, column=5)
 
 comboOut1_1.grid(row=29, column=1)
 comboOut1_2.grid(row=30, column=1)
 comboOut1_3.grid(row=31, column=1)
-comboOut2_1.grid(row=29, column=4)
-comboOut2_2.grid(row=30, column=4)
-comboOut2_3.grid(row=31, column=4)
 
-labelOutputReport.grid(row=33, column=0, pady=10)
-txtOutputCount.grid(row=33, column=1)
+#comboOut2_1.grid(row=29, column=4)
+#comboOut2_2.grid(row=30, column=4)
+#comboOut2_3.grid(row=31, column=4)
 
-labelAnalogOptions.grid(row=35,column=0, pady=10)
-labelAnalogOpts.grid(row=36,column=0)
-comboAnalogOpts.grid(row=36,column=1)
+comboOut2_1.grid(row=32, column=1)
+comboOut2_2.grid(row=33, column=1)
+comboOut2_3.grid(row=34, column=1)
+
+comboOut7.grid(row=35, column=1)
+comboOut8.grid(row=36, column=1)
+
+
+comboOut9.grid(row=29, column=4)
+comboOut10.grid(row=30, column=4)
+comboOut11.grid(row=31, column=4)
+
+comboOut12.grid(row=32, column=4)
+comboOut13.grid(row=33, column=4)
+comboOut14.grid(row=34, column=4)
+comboOut15.grid(row=35, column=4)
+comboOut16.grid(row=36, column=4)
+
+
+comboOut17.grid(row=29, column=6)
+comboOut18.grid(row=30, column=6)
+comboOut19.grid(row=31, column=6)
+comboOut20.grid(row=32, column=6)
+comboOut21.grid(row=33, column=6)
+comboOut22.grid(row=34, column=6)
+
+labelOutputReport.grid(row=33+7, column=0, pady=10)
+txtOutputCount.grid(row=33+7, column=1)
+
+labelAnalogOptions.grid(row=35+7,column=0, pady=10)
+labelAnalogOpts.grid(row=36+7,column=0)
+comboAnalogOpts.grid(row=36+7,column=1)
 comboAnalogOpts.state(['readonly'])
 
-labelAnalogMin.grid(row=38,column=0)
-txtAnalogMin.grid(row=38,column=1)
-labelAnalogMax.grid(row=38,column=2)
-txtAnalogMax.grid(row=38,column=3)
+labelAnalogMin.grid(row=38+7,column=0)
+txtAnalogMin.grid(row=38+7,column=1)
+labelAnalogMax.grid(row=38+7,column=2)
+txtAnalogMax.grid(row=38+7,column=3)
 
 #ScaleAnalogMin.grid(row=38,column=2)
 #ScaleAnalogMax.grid(row=38,column=5)
 
-labelActualMin.grid(row=37,column=1, pady=10)
-labelActualMax.grid(row=37,column=3, pady=10)
+labelActualMin.grid(row=37+7,column=1, pady=10)
+labelActualMax.grid(row=37+7,column=3, pady=10)
 
 
-labelSpecialCase.grid(row=40,column=0, pady=20)
-comboSpecialCase.grid(row=40,column=1)
+labelSpecialCase.grid(row=40+7,column=0, pady=20)
+comboSpecialCase.grid(row=40+7,column=1)
 
-labelId.grid(row=43,column=0, pady=20)
-txtIdString.grid(row=43, column=1, pady=20)
-buttonDeleteId.grid(row=43, column=3, pady=20)
+labelId.grid(row=43+5,column=0, pady=20)
+txtIdString.grid(row=43+5, column=1, pady=20)
+buttonDeleteId.grid(row=43+5, column=3, pady=20)
 
-labelIdStringLength.grid(row=43, column=2)
+labelIdStringLength.grid(row=43+5, column=2)
    
 comboSpecialCase.state(['readonly'])
 
@@ -1587,6 +1830,9 @@ comboP1B8.state(['readonly'])
 comboP1B9.state(['readonly'])
 comboP1DOWN.state(['readonly'])
 comboP1LEFT.state(['readonly'])
+comboCoin1.state(['readonly'])
+comboCoin2.state(['readonly'])
+
 comboP1RIGHT.state(['readonly'])
 comboP1Service.state(['readonly'])
 comboP1Start.state(['readonly'])
@@ -1616,6 +1862,24 @@ comboOut2_1.state(['readonly'])
 comboOut2_2.state(['readonly'])
 comboOut2_3.state(['readonly'])
 
+comboOut7.state(['readonly'])
+comboOut8.state(['readonly'])
+comboOut9.state(['readonly'])
+comboOut10.state(['readonly'])
+
+comboOut11.state(['readonly'])
+comboOut12.state(['readonly'])
+comboOut13.state(['readonly'])
+comboOut14.state(['readonly'])
+comboOut15.state(['readonly'])
+comboOut16.state(['readonly'])
+comboOut17.state(['readonly'])
+comboOut18.state(['readonly'])
+comboOut19.state(['readonly'])
+comboOut20.state(['readonly'])
+comboOut21.state(['readonly'])
+comboOut22.state(['readonly'])
+
 comboAnalogOpts.state(['readonly'])
 
 comboP1B1['values']=digitalinputlist
@@ -1630,6 +1894,8 @@ comboP1B8['values']=digitalinputlist
 comboP1B9['values']=digitalinputlist
 comboP1DOWN['values']=digitalinputlist
 comboP1LEFT['values']=digitalinputlist
+comboCoin1['values']=digitalinputlist
+comboCoin2['values']=digitalinputlist
 comboP1RIGHT['values']=digitalinputlist
 comboP1Service['values']=digitalinputlist
 comboP1Start['values']=digitalinputlist
@@ -1676,6 +1942,24 @@ comboOut1_3['values']=outputlist
 comboOut2_1['values']=outputlist
 comboOut2_2['values']=outputlist
 comboOut2_3['values']=outputlist
+
+
+comboOut7['values']=outputlist
+comboOut8['values']=outputlist
+comboOut9['values']=outputlist
+comboOut10['values']=outputlist
+comboOut11['values']=outputlist
+comboOut12['values']=outputlist
+comboOut13['values']=outputlist
+comboOut14['values']=outputlist
+comboOut15['values']=outputlist
+comboOut16['values']=outputlist
+comboOut17['values']=outputlist
+comboOut18['values']=outputlist
+comboOut19['values']=outputlist
+comboOut20['values']=outputlist
+comboOut21['values']=outputlist
+comboOut22['values']=outputlist
 
 comboAnalogOpts['values']=analogoptionslist
 
@@ -1876,6 +2160,7 @@ frame = Frame(profilemanagerwindow,width=32,height=31)
 
 
 scrollbar = Scrollbar(frame, orient=VERTICAL)
+
 listboxprofiles = Listbox(frame, yscrollcommand=scrollbar.set)
 listboxprofiles.configure(height=30,width=20)
 scrollbar.config(command=listboxprofiles.yview)

@@ -21,3 +21,5 @@ The creation of the MEGA JVS board is documented here: <a href="https://www.arca
 
 There is a compiled binary included in this repository.  This is the firmware that can be uploaded to the board.  You can use a standalone program such as Xloader, which has a GUI, but may not work on newer Windows versions, or the command line tool Arduino Sketch Uploader: https://github.com/twinearthsoftware/ArduinoSketchUploader
 Otherwise, the source code can be compiled and uploaded directly within the Arduino IDE.
+
+As of code version 1.2.1, the profiles data structure has been updated and is no longer backwards compatible with profiles created previously.  A separate converter has been created to update an older PROFILES.HEX to be compatible.  A batch file is included that runs the converter against PROFILES.HEX.  Place PROFILES.HEX in the same directory as the converter and run the .bat file one time.  It will overwrite the file.  Do not run it multiple times against the same file or the file will be corrupted.

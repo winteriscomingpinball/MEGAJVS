@@ -1,10 +1,10 @@
-char versionNum[9]="v1.2.0";
+char versionNum[9]="v1.2.1";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.2.0 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.2.1 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -37,6 +37,7 @@ char versionNum[9]="v1.2.0";
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
+#define PROFILE_SIZE 80 //changed from 62 to 80
 
 #include <SPI.h>
 #include <SD.h>
@@ -366,29 +367,35 @@ struct Mapping_Profile
   uint16_t steering_options[3];
   byte special_case;
   byte smoothing_count;
+  byte coin_pins[2];
+  byte outputs2[8];
+  byte outputs3[8];
 };
 
 //A default profile struct in case SD card is not present
 Mapping_Profile default_profile=
   {
  {
-   P1_SW2,P1_SW1,P1_RIGHT,P1_LEFT,P1_DOWN,P1_UP,P1_SERVICE,P1_START,
+   P1_SW2,P1_SW1,P1_RIGHT,P1_LEFT,P1_DOWN,P1_UP,P1_SERVICE,P1_START, //player1_pins
    0,0,0,P1_SW7,P1_SW6,P1_SW5,P1_SW4,P1_SW3
  },
  {
-   P2_SW2,P2_SW1,P2_RIGHT,P2_LEFT,P2_DOWN,P2_UP,P2_SERVICE,P2_START,
+   P2_SW2,P2_SW1,P2_RIGHT,P2_LEFT,P2_DOWN,P2_UP,P2_SERVICE,P2_START, //player2_pins
    0,0,0,P2_SW7,P2_SW6,P2_SW5,P2_SW4,P2_SW3
  },
  {A0,A1,A2,A3,A4,A5,0,0}
  ,
  {
- 0,0,OUT2_3,OUT2_2,OUT2_1,OUT1_3,OUT1_2,OUT1_1
+ 0,0,OUT2_3,OUT2_2,OUT2_1,OUT1_3,OUT1_2,OUT1_1 //outputs group 1
  },
- "DFLT",
- 22,//changed from 6 to 22
- {1,0,0},
- 0,
- 0
+ "DFLT",//title-profile name
+ 22,//outputs - changed from 6 to 22
+ {1,0,0},//steering_options
+ 0,//special_case
+ 0,//smoothing_count
+ {COIN1,COIN2},//coins
+ {0,0,0,0,0,0,0,0}, //outputs2
+ {0,0,0,0,0,0,0,0} //outputs3
 };
 
 
@@ -411,7 +418,10 @@ Mapping_Profile current_profile=
  6,
  {1,0,0},
  0,
- 0
+ 0,//smoothing_count
+ {COIN1,COIN2},//coins
+ {0,0,0,0,0,0,0,0}, //outputs2
+ {0,0,0,0,0,0,0,0} //outputs3
 };
 
 //Pointer to current profile so that it can be accessed as bytes.
@@ -489,10 +499,28 @@ byte P2_pins[16] =
 0,0,0,0,0,0,0,0
 };
 
+//array to house coin mappings
+byte coin_mappings[2] =
+{
+COIN1,COIN2
+};
+
 // Output pins in order (8,7,6,5,4,3,2,1)
 byte Output_Pins[8]=
 {
  0,0,OUT2_3,OUT2_2,OUT2_1,OUT1_3,OUT1_2,OUT1_1
+};
+
+// Output pins set 2 in order (16,15,14,13,12,11,10,9)
+byte Output_Pins2[8]=
+{
+ 0,0,0,0,0,0,0,0
+};
+
+// Output pins set 3 in order (24,23,22,21,20,19,18,17)
+byte Output_Pins3[8]=
+{
+ 0,0,0,0,0,0,0,0
 };
 
 
@@ -538,10 +566,10 @@ void SDReadLastProfile(){
       Serial.println(lastprofilenum);
     
       myFile = SD.open("PROFILES.HEX", FILE_READ);
-      myFile.seek(lastprofilenum*62);
-      myFile.read(profbuff, 62);
+      myFile.seek(lastprofilenum*PROFILE_SIZE);
+      myFile.read(profbuff, PROFILE_SIZE);
     
-      profilecount = myFile.size()/62;
+      profilecount = myFile.size()/PROFILE_SIZE;
     
       Serial.print("Profile Count from SD Card: ");
       Serial.println(profilecount);
@@ -649,8 +677,8 @@ bool USBswitchmode = false;
 void SDReadProfileX(byte profilex){
   if (SD.exists("PROFILES.HEX")) {
       myFile = SD.open("PROFILES.HEX", FILE_READ);
-      myFile.seek(profilex*62);
-      myFile.read(profbuff, 62);
+      myFile.seek(profilex*PROFILE_SIZE);
+      myFile.read(profbuff, PROFILE_SIZE);
       myFile.close();
   }
   else{
@@ -683,6 +711,13 @@ void ApplyProfile(struct Mapping_Profile profile)
     Array_Copy( P2_pins, profile.player2_pins, 16 );
     Array_Copy( cur_analog_channel_pins, profile.analog_channels, 8);
     Array_Copy( Output_Pins, profile.outputs, 8 );
+
+    Array_Copy( Output_Pins2, profile.outputs2, 8 );
+    Array_Copy( Output_Pins3, profile.outputs3, 8 );
+    
+    
+    Array_Copy( coin_mappings, profile.coin_pins, 8 );
+    
     memcpy( current_profile_name, profile.title, 5 );
     features[13]=profile.output_count;
     cur_special_case = profile.special_case;
@@ -1112,8 +1147,10 @@ void ProcessPacket(struct Packet *p)
           
         case CMD_SETADDRESS:
           sz = 2;
-          
-          deviceId = message[1];
+
+          if (deviceId==-1){
+            deviceId = message[1];
+          }
           
           Serial.println("CMD_SETADDRESS");
           Serial.print("Address is: ");
@@ -1421,27 +1458,61 @@ void ProcessPacket(struct Packet *p)
           break;
         case CMD_WRITEGPIO1:
         {
+          sz = 2 + message[1];
           //Serial.println("CMD_WRITEGPIO1");
-          byte OutputCommand = message[2];
-          for (int i=0;i<8;i++)
-          {
-//            if (bitRead(OutputCommand,i)==1){
-//              Serial.print("Output bit # is ON: ");
-//              Serial.println(i);
-//            }
-            if (Output_Pins[i]>0){
-              if (bitRead(OutputCommand,i)==1){
-                digitalWrite(Output_Pins[i],HIGH);
-              }
-              else{
-                digitalWrite(Output_Pins[i],LOW);
+          byte OutputCommand = 0;
+
+          
+          switch(message[1]){
+            case(3):
+            OutputCommand = message[4];
+            for (int i=0;i<8;i++)
+            {
+              if (Output_Pins3[i]>0){
+                if (bitRead(OutputCommand,i)==1){
+                  digitalWrite(Output_Pins[i],HIGH);
+                }
+                else{
+                  digitalWrite(Output_Pins[i],LOW);
+                }
               }
             }
+            
+            case(2):
+            OutputCommand = message[3];
+            for (int i=0;i<8;i++)
+            {
+              if (Output_Pins2[i]>0){
+                if (bitRead(OutputCommand,i)==1){
+                  digitalWrite(Output_Pins[i],HIGH);
+                }
+                else{
+                  digitalWrite(Output_Pins[i],LOW);
+                }
+              }
+            }
+            case(1):
+            OutputCommand = message[2];
+            for (int i=0;i<8;i++)
+            {
+              if (Output_Pins[i]>0){
+                if (bitRead(OutputCommand,i)==1){
+                  digitalWrite(Output_Pins[i],HIGH);
+                }
+                else{
+                  digitalWrite(Output_Pins[i],LOW);
+                }
+              }
+            }
+            default:
+            break;
+
+            
           }
-        }
-          sz = 2 + message[1];
+          
           Reply();
           break;
+          }
         case CMD_WRITEANALOG:
           Serial.println("CMD_WRITEANALOG");
           sz = 2 + 2 * message[1];
@@ -2034,24 +2105,24 @@ if (USB_Mode==false){
             
 
             //read coins
-            debouncerarray[COIN1].update();
+            debouncerarray[coin_mappings[0]].update();
             if (!debouncerarray[COIN1].read()){
               //coin++;
               coin1_state = true;
             }
 
-            debouncerarray[COIN2].update();
+            debouncerarray[coin_mappings[1]].update();
             if (!debouncerarray[COIN2].read()){
               //coin2++;
               coin2_state = true;
             }
 
-            if (coin1_state == true && debouncerarray[COIN1].read() ){
+            if (coin1_state == true && debouncerarray[coin_mappings[0]].read() ){
               coin1_val++;
               coin1_state = false;
             }
 
-            if (coin2_state == true && debouncerarray[COIN2].read() ){
+            if (coin2_state == true && debouncerarray[coin_mappings[1]].read() ){
               coin2_val++;
               coin2_state = false;
             }

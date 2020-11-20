@@ -1,10 +1,10 @@
-char versionNum[9]="v1.2.2";
+char versionNum[9]="v1.2.3";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.2.2 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.2.3 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -1726,7 +1726,7 @@ void loop()
             }
         #endif
             
-            if (timer > 10000){
+            //if (timer > 10000){
               if ( profile_state == true && digitalRead(PROFILE_PIN_NUM) ){
                 //profile code
                 ChangeProfile();
@@ -1736,7 +1736,7 @@ void loop()
                 //Serial.println("Profile button pressed!");
                 timer=0;
               }
-            }
+            //}
 
 if (USB_Mode==false){
 
@@ -2107,13 +2107,13 @@ if (USB_Mode==false){
 
             //read coins
             debouncerarray[coin_mappings[0]].update();
-            if (!debouncerarray[COIN1].read()){
+            if (!debouncerarray[coin_mappings[0]].read()){
               //coin++;
               coin1_state = true;
             }
 
             debouncerarray[coin_mappings[1]].update();
-            if (!debouncerarray[COIN2].read()){
+            if (!debouncerarray[coin_mappings[1]].read()){
               //coin2++;
               coin2_state = true;
             }

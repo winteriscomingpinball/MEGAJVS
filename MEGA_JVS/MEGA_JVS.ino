@@ -482,7 +482,10 @@ byte cur_analog_channel_pins[8] =
   A0,A1,A2,A3,0,0,0,0
 };
 
-
+/*P1 Pin Order
+ * P1 Button2, P1 Button1, P1 Right, P1 Left, P1 Down, P1 Up, P1 Service, P1 Start
+ * P1 Button10, P1 Button9, P1 Button8, P1 Button7, P1 Button6, P1 Button5, P1 Button4, P1 Button3,
+*/
 byte P1_pins[16] =
 {
 0,VIEW_SW_PIN,0,0,SHIFT_DOWN_PIN,SHIFT_UP_PIN,P1_SERVICE,P1_START,
@@ -491,7 +494,7 @@ byte P1_pins[16] =
 
 /*P2 Pin Order
  * P2 Button2, P2 Button1, P2 Right, P2 Left, P2 Down, P2 Up, P2 Service, P2 Start
- * P2 Button7, P2 Button6, P2 Button5, P2 Button4, P2 Button3,
+ * P2 Button10, P2 Button9, P2 Button8, P2 Button7, P2 Button6, P2 Button5, P2 Button4, P2 Button3,
 */
 byte P2_pins[16] =
 {

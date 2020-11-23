@@ -586,7 +586,8 @@ void SDReadLastProfile(){
     myFile = SD.open("LASTPROF.HEX", FILE_WRITE);
     
     myFile.seek(0);
-    myFile.write(0);
+    lastprofilenum=0;
+    myFile.write(lastprofilenum);
     myFile.close();
     
   }

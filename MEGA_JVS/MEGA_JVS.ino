@@ -1,10 +1,10 @@
-char versionNum[9]="v1.2.4";
+char versionNum[9]="v1.2.5";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.2.4 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.2.5 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -545,12 +545,6 @@ void showlogo(){
   u8g.firstPage();
   do {
     u8g.drawBitmap(-2,0,16,64,pic_Logo_bmp);
-    //u8g.drawBitmapP(0,0,16,64,pic_Logo_bmp);
-
-    //u8g.setFont(u8g_font_u8glib_4);
-    //u8g.setFont(u8g_font_5x8);
-    //u8g.setFont(u8g_font_helvR08);
-    //u8g.setFont(u8g_font_7x14B);
     u8g.setFont(u8g_font_timB10);
     u8g.drawStr(90,56,current_profile_name);
   } while ( u8g.nextPage() );
@@ -737,7 +731,7 @@ void ApplyProfile(struct Mapping_Profile profile)
     cur_steering_options[2]=profile.steering_options[2];
 
     Serial.print("Special Case from loaded profile: ");
-    Serial.println(cur_special_case);
+    Serial.println(cur_special_case); 
 
     SDLookupIDString();
 }
@@ -756,26 +750,16 @@ void ChangeProfile()
   }
 
   //read profile from SD card
-  SDReadProfileX(current_profile_num);
+  SDReadProfileX((byte)current_profile_num);
   
   ApplyProfile(current_profile);
 
   //Write profile num to LASTPROF.HEX on SD Card
-  SDWriteLastProfile(current_profile_num);
-
-  #if PROFILE_SERIAL == 1
-  Serial.print("Profile change to: ");
-  Serial.println(current_profile_name);
-  Serial.print("Profile num: ");
-  Serial.println(current_profile_num);
-  //Serial.print("Special case: ");
-  //Serial.println(cur_special_case);
-  #endif
+  SDWriteLastProfile((byte)current_profile_num);
 
 
     char  prof_num[16];
-    sprintf(prof_num,"Profile #: %d",current_profile_num);   
-      //u8g.clear();
+    sprintf(prof_num,"Profile #: %d",current_profile_num);
 
       u8g.firstPage();
       do {
@@ -834,28 +818,10 @@ void setup()
   u8g.begin();
   showlogo();
   
-  //Serial.println(sizeof(mapping_profile_test));
-  
-  //u8g2.drawBitmap(0,0,16,54,pic_Logo_bmp);
-  //u8g2.drawBitmap(0,0,16,64,pic_Logo_bmp);
-  
-//  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
-//  display.clearDisplay();
-//  display.setTextSize(2);
-//  display.setTextColor(WHITE);
-//  display.setCursor(0,0);
-//  display.println("MEGA JVS");
-//  display.setTextSize(1);
-//  display.display();
-  
   int i =0;
-  
-  
-  //Serial1.transmitterEnable(PIN_TXENABLE);
+ 
   pinMode(PIN_TXENABLE, OUTPUT);
   digitalWrite(PIN_TXENABLE, LOW);
-  
-  //Serial.println("Pin Sense set to OUTPUT and LOW");
   
   pinMode(PIN_LED, OUTPUT);
 
@@ -888,17 +854,7 @@ void setup()
   else{
     Serial.println("MEGA JVS - MEGA 2560 Version");
   }
-  
-
-//  Serial.print("Number of profiles: ");
-//  Serial.println(sizeof(mapping_profiles)/93);
-  
-//  if (steering_center_smoothing==true){
-//    Serial.println("Steering smoothing: ON");
-//  }
-//  else{
-//    Serial.println("Steering smoothing: OFF");
-//  }
+ 
   
 
   //Initialize all main input pins as inputs                                         
@@ -985,7 +941,7 @@ void WMMT_Gear_Change()
               //coin++;
               WMMT_shift_down_state = true;
               WMMT_shift_down_timer = 0;
-              //digitalWrite(START_LAMP,HIGH);
+              
             }
             
             if (WMMT_shift_down_timer > 5000){
@@ -994,8 +950,6 @@ void WMMT_Gear_Change()
                 
                 WMMT_shift_down_state = false;
                 shift_direction = -1;
-                //digitalWrite(START_LAMP,LOW);
-                //Serial.println("Profile button pressed!");
                 WMMT_shift_down_timer=0;
               }
             }
@@ -1005,7 +959,6 @@ void WMMT_Gear_Change()
               //coin++;
               WMMT_shift_up_state = true;
               WMMT_shift_up_timer = 0;
-              //digitalWrite(START_LAMP,HIGH);
             }
             
             if (WMMT_shift_up_timer > 5000){
@@ -1014,8 +967,6 @@ void WMMT_Gear_Change()
                 
                 WMMT_shift_up_state = false;
                 shift_direction = 1;
-                //digitalWrite(START_LAMP,LOW);
-                //Serial.println("Profile button pressed!");
                 WMMT_shift_up_timer=0;
               }
             }
@@ -1162,10 +1113,7 @@ void ProcessPacket(struct Packet *p)
           if (deviceId==-1){
             deviceId = message[1];
             Reply();
-          }//else{
-
-            //ReplyByte(0x03);
-          //}
+          }
           
           Serial.println("CMD_SETADDRESS");
           Serial.print("Address is: ");
@@ -1183,11 +1131,6 @@ void ProcessPacket(struct Packet *p)
           int id_size=0;
           
           if (profileIDSet){
-              
-              //Serial.print("ID Length is: ");
-              //Serial.println(IDLength);
-
-              //pProfileId = profileID;
 
               strcpy(outBuf, profileID); 
               id_size=IDLength+1;
@@ -1195,41 +1138,21 @@ void ProcessPacket(struct Packet *p)
           else{
               #if defined(__AVR_ATmega2560__)
               char full_id[]="MEGA JVS;I/O BD JVS;MEGA 2560 Version";
-              //char full_id[]="SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551 ;Ver1.00;98/10";
-              //char full_id[]=  "SEGA CORPORATION;I/O BD JVS;837-14572;Ver1.00;2005/10";
               
               #endif
               #if defined (_VARIANT_ARDUINO_DUE_X_)
               char full_id[]="MEGA JVS;I/O BD JVS;DUE Version";
               #endif
-              //int i2=0;
               id_size = sizeof(full_id);
-              
-              //for (int i = id_size-1; i<id_size+8; i++){
-              // full_id[i]=current_profile_name[i2];
-              // i2++;
-              //}
-              //id_size+=i2;
               id_size++;
-              //pProfileId=full_id;
+
               
               strcpy(outBuf, full_id); 
 
               
               
           }
-          //id_size = strlen(outBuf) + 1;
           ReplyBytes(outBuf, id_size);
-          
-          //IDSent=1;
-          //if (IDSent==1 && featuresSent==1){
-          //  waitForComms=false;
-          //}
-          //Serial.println(outBuf);
-          
-          
-          
-          
           
           break;
         }
@@ -1252,10 +1175,6 @@ void ProcessPacket(struct Packet *p)
           {
           Serial.println("CMD_GETFEATURES");
           ReplyBytes(features, 17);
-          //featuresSent=1;
-          //if (IDSent==1 && featuresSent==1){
-          //  waitForComms=false;
-          //}
           break;
           }
         case CMD_SETMAINBOARDID:
@@ -1284,102 +1203,13 @@ void ProcessPacket(struct Packet *p)
             break;
           }
         case CMD_READCOIN:
-          {
-            
-            
-            
-         
+          {         
             byte coins[4] = {(byte)(coin1_val >> 8), (byte)coin1_val, (byte)(coin2_val >> 8), (byte)coin2_val};
-            //byte coins[2] = {(byte)(coin >> 8), (byte)coin};
-            //Serial.println("CMD_READCOIN");
+            
             sz = 2;
             ReplyBytes(coins, message[1] * 2);
             break;
           }
-//        case CMD_READANALOG:
-//        {
-//          #if DEBUG == 1
-//          Serial.println("CMD_READANALOG");
-//          #endif
-//          sz = 2;
-//
-//          for (int i = 0; i < 8; i++)
-//            { 
-//              int analogVal = 0;
-//              byte analogByte1 = 0;
-//              byte analogByte2 = 0;
-//              if (cur_analog_channel_pins[i] != 0){
-//                analogVal = analogRead(cur_analog_channel_pins[i]);
-//
-//               //Check if steering channel and apply special cases if needed.
-//               switch (i)
-//               {
-//                case 0:
-//                {
-//                //apply scaling to steering if steering option is set to 2 or 3
-//               
-//                if (cur_steering_options[0]==2 || cur_steering_options[0]==3){
-//                  analogByte1 = analogVal>>2;
-//                  analogByte1 = map(analogByte1,STEERING_MIN,STEERING_MAX,cur_steering_options[1],cur_steering_options[2]);
-//                  analogByte2 = 0;
-//                }
-//                else{
-//                  analogByte1 = analogVal>>2;
-//                  analogByte2 = analogVal<<6;
-//                }
-//                
-//               }
-//
-//               
-//               break;
-//
-//               case 1:
-//               {
-//                //Do Nothing
-//               }
-//
-//               analogByte1 = analogVal>>2;
-//               analogByte2 = analogVal<<6;
-//                
-//               break;
-//
-//               case 2:
-//               {
-//                //Do Nothing
-//               }
-//               analogByte1 = analogVal>>2;
-//               analogByte2 = analogVal<<6;
-//               break;
-//               
-//               default:
-//               analogByte1 = analogVal>>2;
-//               analogByte2 = analogVal<<6;
-//               break;
-//               }
-//                
-//                
-//                
-//              
-//              }
-//              else{
-//                analogByte1 =0;
-//                analogByte2 =0;
-//              }
-//
-//              
-//              //suppress 2nd byte of analog data if steering options are set to 1 or 3
-//              if (cur_steering_options[0]==1 || cur_steering_options[0]==3){
-//                 analogByte2 = 0x00;
-//              }
-//
-//              
-//              analog_channel_data[i*2] = analogByte1;
-//              analog_channel_data[i*2 + 1] = analogByte2;
-//            }
-//          
-//          ReplyBytes(analog_channel_data, message[1] * 2);
-//          break;
-//        }
         case CMD_READANALOG:
         {
           #if DEBUG == 1
@@ -1452,12 +1282,6 @@ void ProcessPacket(struct Packet *p)
                           coin2_val = 0;
                       }
                   }
-            //Serial.println("Start: ");
-            //for (int i=0; i<50; i++){
-            //  Serial.print(": 0x");
-            //  Serial.print(packet.message[i],HEX);
-            //}
-            //Serial.println(": End");
             
             
             Reply();

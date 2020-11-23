@@ -2,8 +2,10 @@ from tkinter import *
 from tkinter import filedialog, ttk
 from tkinter.scrolledtext import ScrolledText
 import serial
+import time
 
 import struct
+
 
 IdInfo=bytearray(0);
 
@@ -352,9 +354,12 @@ def setupserial():
    try:
       ser = serial.Serial(port=portname,bytesize=serial.EIGHTBITS,baudrate=115200,
                           parity=serial.PARITY_EVEN,stopbits=serial.STOPBITS_ONE,
-                          dsrdtr=True)
+                          dsrdtr=False)
       labelswitchteststatus.configure(text="Serial port opened.",fg="green")
       serialopen=True
+      print("Sleeping while unit resets...")
+      time.sleep(4)
+      print("Done sleeping...")
       resetswitches()
    except:
       labelswitchteststatus.configure(text="Error opening port.",fg="red")

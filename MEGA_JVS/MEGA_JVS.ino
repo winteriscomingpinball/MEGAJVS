@@ -1,10 +1,10 @@
-char versionNum[9]="v1.2.3";
+char versionNum[9]="v1.2.4";
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.2.3 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.2.4 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -582,7 +582,13 @@ void SDReadLastProfile(){
       current_profile_num = lastprofilenum;
   }
   else{
-    Serial.println("Can't find LASTPROF.HEX on SD card.");
+    Serial.println("Can't find LASTPROF.HEX on SD card, adding it now.");
+    myFile = SD.open("LASTPROF.HEX", FILE_WRITE);
+    
+    myFile.seek(0);
+    myFile.write(0);
+    myFile.close();
+    
   }
 }
 
@@ -625,6 +631,7 @@ void SDLookupIDString(){
   }
   else{
     Serial.println("Can't find IDS.HEX on SD card.");
+    
   }
 }
 

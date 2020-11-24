@@ -1,10 +1,12 @@
-char versionNum[9]="v1.2.5";
+char versionNum[9]="v1.2.7";
+
+//#define DEBUG 1
 
 //NEED TO REWORK MEGA 2560 HID inputs for debounce
 
 //Confirmed working on Arduino IDE version 1.6.12
 
-//MEGA JVS - Code V1.2.5 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
+//MEGA JVS - Code V1.2.7 - For MEGA JVS V2, MEGA JVS V3, MEGA JVS V3.1 and Darksoft's MultiJVS: https://www.arcade-projects.com/forums/index.php?thread/13532-multi-jvs-v1-0/
 
 //Built on top of TeensyJVS code by charcole.
 //TeensyJVS can be found here: https://github.com/charcole/TeensyJVS
@@ -1057,6 +1059,21 @@ void FlushReply()
   digitalWrite(PIN_TXENABLE, LOW);
 }
 
+void FlushReplyUnknown()
+{
+  digitalWrite(PIN_TXENABLE, HIGH);
+    
+    Serial1.write(0xE0);
+    Serial1.write(0x00);//goes to master
+    Serial1.write(0x02);//length of 2
+    Serial1.write(0x02);//unknown command status
+    Serial1.write(0x04);//checksum
+    
+  Serial1.flush();
+
+  digitalWrite(PIN_TXENABLE, LOW);
+}
+
 void Resend()
 {
   Reply *r = &reply[curReply];
@@ -1085,6 +1102,7 @@ void ProcessPacket(struct Packet *p)
 {
   if (p->address == 0xFF || p->address == deviceId) // Yay, it's for me
   {
+    int knowncmd=1;
     int length = p->length;
     byte *message = p->message;
     while (length > 0)
@@ -1093,10 +1111,11 @@ void ProcessPacket(struct Packet *p)
       switch (message[0])
       {
         case CMD_RESET:
+          #if DEBUG == 1
           Serial.println("CMD_RESET");
-       
-          digitalWrite(START_LAMP,LOW);
-          digitalWrite(VIEW_LAMP,LOW);
+          #endif
+          //digitalWrite(START_LAMP,LOW);
+          //digitalWrite(VIEW_LAMP,LOW);
           coin1_val=0;
           coin2_val=0;
           waitForComms=true;
@@ -1114,11 +1133,17 @@ void ProcessPacket(struct Packet *p)
             deviceId = message[1];
             Reply();
           }
-          
+
+          #if DEBUG == 1
           Serial.println("CMD_SETADDRESS");
           Serial.print("Address is: ");
           Serial.println(deviceId);
+          #endif
+
+          
           digitalWrite(PIN_SENSE, HIGH);
+          
+          
           break;
     
         case CMD_SETMETHOD:
@@ -1126,7 +1151,10 @@ void ProcessPacket(struct Packet *p)
 
         case CMD_READID:
         {
+          #if DEBUG == 1
           Serial.println("CMD_READID");
+          #endif
+          
           char outBuf[102] = { 0 };
           int id_size=0;
           
@@ -1158,28 +1186,38 @@ void ProcessPacket(struct Packet *p)
         }
         
         case CMD_FORMATVERSION:
+          #if DEBUG == 1
           Serial.println("CMD_FORMATVERSION");
+          #endif
           ReplyByte(0x13);
           //ReplyByte(0x11);
           break;
         case CMD_JVSVERSION:
+          #if DEBUG == 1
           Serial.println("CMD_JVSVERSION");
+          #endif
           ReplyByte(0x30);
           //ReplyByte(0x20);
           break;
         case CMD_COMMSVERSION:
+          #if DEBUG == 1
           Serial.println("CMD_COMMSVERSION");
+          #endif
           ReplyByte(0x10);
           break;
         case CMD_GETFEATURES:
           {
+          #if DEBUG == 1
           Serial.println("CMD_GETFEATURES");
+          #endif
           ReplyBytes(features, 17);
           break;
           }
         case CMD_SETMAINBOARDID:
           {
+          #if DEBUG == 1
           Serial.println("CMD_SETMAINBOARDID");
+          #endif
           sz = strlen((char*)&message[1]) + 1;
           Reply();
           //ReplyString("test;test;1;1");
@@ -1220,33 +1258,35 @@ void ProcessPacket(struct Packet *p)
           ReplyBytes(analog_channel_data, message[1] * 2);
           break;
         }
-        case CMD_READROTARY:
-          Serial.println("CMD_READROTARY");
-          sz = 2;
-          ReplyBytes(zeros, message[1] * 2);
-          break;
-        case CMD_READKEYCODE:
-          Serial.println("CMD_READKEYCODE");
-          Reply();
-          break;
-        case CMD_READSCREENPOS:
-          Serial.println("CMD_READSCREENPOS");
-          sz = 2;
-          ReplyBytes(zeros, 4);
-          break;
-        case CMD_READGPIO:
-          Serial.println("CMD_READGPIO");
-          sz = 2;
-          ReplyBytes(zeros, message[1]);
-          break;
+//        case CMD_READROTARY:
+//          Serial.println("CMD_READROTARY");
+//          sz = 2;
+//          ReplyBytes(zeros, message[1] * 2);
+//          break;
+//        case CMD_READKEYCODE:
+//          Serial.println("CMD_READKEYCODE");
+//          Reply();
+//          break;
+//        case CMD_READSCREENPOS:
+//          Serial.println("CMD_READSCREENPOS");
+//          sz = 2;
+//          ReplyBytes(zeros, 4);
+//          break;
+//        case CMD_READGPIO:
+//          Serial.println("CMD_READGPIO");
+//          sz = 2;
+//          ReplyBytes(zeros, message[1]);
+//          break;
 
-        case CMD_WRITEPAYOUTREMAINING:
-          Serial.println("CMD_WRITEPAYOUTREMAINING");
-          sz = 2;
-          ReplyBytes(zeros, 4);
-          break;
+//        case CMD_WRITEPAYOUTREMAINING:
+//          Serial.println("CMD_WRITEPAYOUTREMAINING");
+//          sz = 2;
+//          ReplyBytes(zeros, 4);
+//          break;
         case CMD_RESEND:
+          #if DEBUG == 1
           Serial.println("CMD_RESEND");
+          #endif
           Resend();
           break;
         case CMD_WRITECOINSUBTRACT:
@@ -1255,7 +1295,9 @@ void ProcessPacket(struct Packet *p)
           slotNum= message[1];
           coinModifier = (message[2] << 8) | message[3];
           
+          #if DEBUG == 1
           Serial.println("CMD_WRITECOINSUBTRACT");
+          #endif
           
               sz = 4;
             
@@ -1287,11 +1329,11 @@ void ProcessPacket(struct Packet *p)
             Reply();
             break;
           }
-        case CMD_WRITEPAYOUT:
-          Serial.println("CMD_WRITEPAYOUT");
-          sz = 4;
-          Reply();
-          break;
+//        case CMD_WRITEPAYOUT:
+//          Serial.println("CMD_WRITEPAYOUT");
+//          sz = 4;
+//          Reply();
+//          break;
         case CMD_WRITEGPIO1:
         {
           sz = 2 + message[1];
@@ -1349,60 +1391,62 @@ void ProcessPacket(struct Packet *p)
           Reply();
           break;
           }
-        case CMD_WRITEANALOG:
-          Serial.println("CMD_WRITEANALOG");
-          sz = 2 + 2 * message[1];
-          Reply();
-          break;
-        case CMD_WRITECHAR:
-          Serial.println("CMD_WRITECHAR");
-          sz = 2 + message[1];
-          Reply();
-          break;
+//        case CMD_WRITEANALOG:
+//          Serial.println("CMD_WRITEANALOG");
+//          sz = 2 + 2 * message[1];
+//          Reply();
+//          break;
+//        case CMD_WRITECHAR:
+//          Serial.println("CMD_WRITECHAR");
+//          sz = 2 + message[1];
+//          Reply();
+//          break;
         case CMD_WRITECOINADDED:
           {
+            #if DEBUG == 1
             Serial.println("CMD_WRITECOINADDED");
+            #endif
           
-          sz = 4;
+            sz = 4;
 
                     coinModifier = (message[2] << 8) | message[3];
                     slotNum= message[1];
           
                 if (slotNum == 1)
-                {
-                    
-                        coin1_val += coinModifier;
-                    
+                {   
+                        coin1_val += coinModifier;   
                 } else if (slotNum == 2)
                 {
-                   
                         coin2_val += coinModifier;
-                  
-
                 }
-
-                
           Reply();
           break;
           }
-        case CMD_WRITEPAYOUTSUBTRACT:
-          Serial.println("CMD_WRITEPAYOUTSUBTRACT");
-          sz = 4;
-          Reply();
-          break;
-        case CMD_WRITEGPIOBYTE:
-          Serial.println("CMD_WRITEGPIOBYTE");
-          sz = 3;
-          Reply();
-          break;
-        case CMD_WRITEGPIOBIT:
-          Serial.println("CMD_WRITEGPIOBIT");
-          sz = 3;
-          Reply();
-          break;
+//        case CMD_WRITEPAYOUTSUBTRACT:
+//          Serial.println("CMD_WRITEPAYOUTSUBTRACT");
+//          sz = 4;
+//          Reply();
+//          break;
+//        case CMD_WRITEGPIOBYTE:
+//          Serial.println("CMD_WRITEGPIOBYTE");
+//          sz = 3;
+//          Reply();
+//          break;
+//        case CMD_WRITEGPIOBIT:
+//          Serial.println("CMD_WRITEGPIOBIT");
+//          sz = 3;
+//          Reply();
+//          break;
         default:
+          #if DEBUG == 1
           Serial.println("Got unknown");
+          #endif
+
           Reply();
+          
+          knowncmd=0;
+          
+          goto EXITWHILE;
           break;
       }
       message += sz;
@@ -1415,7 +1459,24 @@ void ProcessPacket(struct Packet *p)
       Reply();
       //FlushErrorReply();
     }
-    FlushReply();
+    
+
+    EXITWHILE:{
+    
+      if(knowncmd){
+        #if DEBUG == 1
+        Serial.println("flush reply");
+        #endif
+        FlushReply();
+      }else{
+        #if DEBUG == 1
+        Serial.println("flush unknown");
+        #endif
+        FlushReplyUnknown();
+      }
+    }
+    
+    
   }
   else
   {
@@ -1480,8 +1541,8 @@ void USB_loop() {
 
   //Joystick.setXAxis(convertedVal);
   
-SerialUSB.print("Actual Value: ");
-SerialUSB.print(analogVal);
+  SerialUSB.print("Actual Value: ");
+  SerialUSB.print(analogVal);
   SerialUSB.print("     - Converted Val: ");
   SerialUSB.println(convertedVal);
 

@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog, ttk
 from tkinter.scrolledtext import ScrolledText
-import serial
+#import serial
 import time
 
 import struct
@@ -23,7 +23,7 @@ serialopen=False
 wheelmin=0
 wheelmax=255
 
-ser = serial.Serial
+#ser = serial.Serial
 
 digitalinputlist = [
 "NOT ASSIGNED",
@@ -343,35 +343,35 @@ def reopenprofiles():
    comboProfiles.current(newindex=savedindex)
    selectedprofile(0)
 
-def setupserial():
-   global ser
-   global serialopen
-   #setup serial connection for USB Switch Test Mode
-   print("Setting up serial")
-   portname = txtserialportname.get()
-   print("Attempting to open port: " + portname)
+# def setupserial():
+   # global ser
+   # global serialopen
+   # #setup serial connection for USB Switch Test Mode
+   # print("Setting up serial")
+   # portname = txtserialportname.get()
+   # print("Attempting to open port: " + portname)
 
-   try:
-      ser = serial.Serial(port=portname,bytesize=serial.EIGHTBITS,baudrate=115200,
-                          parity=serial.PARITY_EVEN,stopbits=serial.STOPBITS_ONE,
-                          dsrdtr=False)
-      labelswitchteststatus.configure(text="Serial port opened.",fg="green")
-      serialopen=True
-      print("Sleeping while unit resets...")
-      time.sleep(4)
-      print("Done sleeping...")
-      resetswitches()
-   except:
-      labelswitchteststatus.configure(text="Error opening port.",fg="red")
-      ser.close()
-      serialopen=False
+   # try:
+      # ser = serial.Serial(port=portname,bytesize=serial.EIGHTBITS,baudrate=115200,
+                          # parity=serial.PARITY_EVEN,stopbits=serial.STOPBITS_ONE,
+                          # dsrdtr=False)
+      # labelswitchteststatus.configure(text="Serial port opened.",fg="green")
+      # serialopen=True
+      # print("Sleeping while unit resets...")
+      # time.sleep(4)
+      # print("Done sleeping...")
+      # resetswitches()
+   # except:
+      # labelswitchteststatus.configure(text="Error opening port.",fg="red")
+      # ser.close()
+      # serialopen=False
 
-def closeserial():
-   global ser
-   global serialopen
-   serialopen=False
-   ser.close()
-   labelswitchteststatus.configure(text="Serial port closed.",fg="black")
+# def closeserial():
+   # global ser
+   # global serialopen
+   # serialopen=False
+   # ser.close()
+   # labelswitchteststatus.configure(text="Serial port closed.",fg="black")
    
    
 def importprofile():
@@ -404,65 +404,65 @@ def importprofile():
       print("no file opened")
       labelStatus.configure(fg="red",text="No file selected!")
       
-def resetswitches():
-   global ser
-   global serialopen
-   if serialopen:
-      packet = bytes([0x53,0x50,0x00,0x00])
-      ser.write(packet)
+# def resetswitches():
+   # global ser
+   # global serialopen
+   # if serialopen:
+      # packet = bytes([0x53,0x50,0x00,0x00])
+      # ser.write(packet)
       
-      lblTEST.configure(text='OFF',fg='black')
-      lblP1_START.configure(text='OFF',fg='black')
-      lblP1_SERVICE.configure(text='OFF',fg='black')
-      lblP1_UP.configure(text='OFF',fg='black')
-      lblP1_DOWN.configure(text='OFF',fg='black')
-      lblP1_LEFT.configure(text='OFF',fg='black')
-      lblP1_RIGHT.configure(text='OFF',fg='black')
-      lblP1_B1.configure(text='OFF',fg='black')
-      lblP1_B2.configure(text='OFF',fg='black')
-      lblP1_B3.configure(text='OFF',fg='black')
-      lblP1_B4.configure(text='OFF',fg='black')
-      lblP1_B5.configure(text='OFF',fg='black')
-      lblP1_B6.configure(text='OFF',fg='black')
-      lblP1_B7.configure(text='OFF',fg='black')
-      lblP1_B8.configure(text='OFF',fg='black')
-      lblP1_B9.configure(text='OFF',fg='black')
-      lblP1_B10.configure(text='OFF',fg='black')
-      lblP2_START.configure(text='OFF',fg='black')
-      lblP2_SERVICE.configure(text='OFF',fg='black')
-      lblP2_UP.configure(text='OFF',fg='black')
-      lblP2_DOWN.configure(text='OFF',fg='black')
-      lblP2_LEFT.configure(text='OFF',fg='black')
-      lblP2_RIGHT.configure(text='OFF',fg='black')
-      lblP2_B1.configure(text='OFF',fg='black')
-      lblP2_B2.configure(text='OFF',fg='black')
-      lblP2_B3.configure(text='OFF',fg='black')
-      lblP2_B4.configure(text='OFF',fg='black')
-      lblP2_B5.configure(text='OFF',fg='black')
-      lblP2_B6.configure(text='OFF',fg='black')
-      lblP2_B7.configure(text='OFF',fg='black')
-      lblP2_B8.configure(text='OFF',fg='black')
-      lblP2_B9.configure(text='OFF',fg='black')
-      lblP2_B10.configure(text='OFF',fg='black')
+      # lblTEST.configure(text='OFF',fg='black')
+      # lblP1_START.configure(text='OFF',fg='black')
+      # lblP1_SERVICE.configure(text='OFF',fg='black')
+      # lblP1_UP.configure(text='OFF',fg='black')
+      # lblP1_DOWN.configure(text='OFF',fg='black')
+      # lblP1_LEFT.configure(text='OFF',fg='black')
+      # lblP1_RIGHT.configure(text='OFF',fg='black')
+      # lblP1_B1.configure(text='OFF',fg='black')
+      # lblP1_B2.configure(text='OFF',fg='black')
+      # lblP1_B3.configure(text='OFF',fg='black')
+      # lblP1_B4.configure(text='OFF',fg='black')
+      # lblP1_B5.configure(text='OFF',fg='black')
+      # lblP1_B6.configure(text='OFF',fg='black')
+      # lblP1_B7.configure(text='OFF',fg='black')
+      # lblP1_B8.configure(text='OFF',fg='black')
+      # lblP1_B9.configure(text='OFF',fg='black')
+      # lblP1_B10.configure(text='OFF',fg='black')
+      # lblP2_START.configure(text='OFF',fg='black')
+      # lblP2_SERVICE.configure(text='OFF',fg='black')
+      # lblP2_UP.configure(text='OFF',fg='black')
+      # lblP2_DOWN.configure(text='OFF',fg='black')
+      # lblP2_LEFT.configure(text='OFF',fg='black')
+      # lblP2_RIGHT.configure(text='OFF',fg='black')
+      # lblP2_B1.configure(text='OFF',fg='black')
+      # lblP2_B2.configure(text='OFF',fg='black')
+      # lblP2_B3.configure(text='OFF',fg='black')
+      # lblP2_B4.configure(text='OFF',fg='black')
+      # lblP2_B5.configure(text='OFF',fg='black')
+      # lblP2_B6.configure(text='OFF',fg='black')
+      # lblP2_B7.configure(text='OFF',fg='black')
+      # lblP2_B8.configure(text='OFF',fg='black')
+      # lblP2_B9.configure(text='OFF',fg='black')
+      # lblP2_B10.configure(text='OFF',fg='black')
 
       
       
    
-def sendswitchserial(section,switchByte,lbl):
+# def sendswitchserial(section,switchByte,lbl):
    
-   global ser
-   global serialopen
-   packet = bytes([0x53,0x50,section,switchByte])
+   # global ser
+   # global serialopen
+   # packet = bytes([0x53,0x50,section,switchByte])
 
-   if serialopen:
-      ser.write(packet)
-      swstate=lbl.cget("text")
-      if swstate=="ON":
-         lbl.configure(text='OFF',fg="black")
-      else:
-         lbl.configure(text='ON',fg="green")
-   else:
-      labelswitchteststatus.configure(text="Port not open!",fg="red")
+   # if serialopen:
+      # ser.write(packet)
+      # swstate=lbl.cget("text")
+      # if swstate=="ON":
+         # lbl.configure(text='OFF',fg="black")
+      # else:
+         # lbl.configure(text='ON',fg="green")
+   # else:
+      # labelswitchteststatus.configure(text="Port not open!",fg="red")
 
 def exportprofile():
    global filename
@@ -1984,164 +1984,164 @@ switchtestmenubar = Menu(switchtestwindow)
 switchtestmenubar.add_command(label = "Profile Editor",command=switchtestclosing)
 switchtestwindow.config(menu=switchtestmenubar)
 
-labelserialportname = Label(switchtestwindow, text="Enter Serial Port Name.")
-labelserialportname.grid(row=0,column=0)
-txtserialportname = Entry(switchtestwindow)
-txtserialportname.grid(row=0,column=1)
-buttonsetupserial = ttk.Button(switchtestwindow, text='Start Serial', command=setupserial, width = 20)
-buttonsetupserial.grid(row=0,column=2)
-labelswitchteststatus = Label(switchtestwindow, text="")
-labelswitchteststatus.grid(row=0,column=3)
-buttoncloseserial = ttk.Button(switchtestwindow, text='Close Serial', command=closeserial, width = 20)
-buttoncloseserial.grid(row=2,column=2)
-labeldirections = Label(switchtestwindow, text="Click to toggle input.")
-labeldirections.grid(row=3,column=0)
+# labelserialportname = Label(switchtestwindow, text="Enter Serial Port Name.")
+# labelserialportname.grid(row=0,column=0)
+# txtserialportname = Entry(switchtestwindow)
+# txtserialportname.grid(row=0,column=1)
+# buttonsetupserial = ttk.Button(switchtestwindow, text='Start Serial', command=setupserial, width = 20)
+# buttonsetupserial.grid(row=0,column=2)
+# labelswitchteststatus = Label(switchtestwindow, text="")
+# labelswitchteststatus.grid(row=0,column=3)
+# buttoncloseserial = ttk.Button(switchtestwindow, text='Close Serial', command=closeserial, width = 20)
+# buttoncloseserial.grid(row=2,column=2)
+# labeldirections = Label(switchtestwindow, text="Click to toggle input.")
+# labeldirections.grid(row=3,column=0)
 
-buttonresetswitches = ttk.Button(switchtestwindow, text='Reset Switches', command=resetswitches, width = 20)
-buttonresetswitches.grid(row=3,column=1)
+# buttonresetswitches = ttk.Button(switchtestwindow, text='Reset Switches', command=resetswitches, width = 20)
+# buttonresetswitches.grid(row=3,column=1)
 
-buttontestmode = ttk.Button(switchtestwindow, text='TEST', command=lambda: sendswitchserial(0x05,0x80,lblTEST), width = 20)
-buttontestmode.grid(row=3,column=3)
-lblTEST=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblTEST.grid(row=3,column=4)
+# buttontestmode = ttk.Button(switchtestwindow, text='TEST', command=lambda: sendswitchserial(0x05,0x80,lblTEST), width = 20)
+# buttontestmode.grid(row=3,column=3)
+# lblTEST=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblTEST.grid(row=3,column=4)
 
-buttonswtstP1_START = ttk.Button(switchtestwindow, text='P1_START', command= lambda: sendswitchserial(0x01,0x80,lblP1_START) , width = 20)
-buttonswtstP1_SERVICE = ttk.Button(switchtestwindow, text='P1_SERVICE', command= lambda: sendswitchserial(0x01,0x40,lblP1_SERVICE) , width = 20)
-buttonswtstP1_UP = ttk.Button(switchtestwindow, text='P1_UP', command= lambda: sendswitchserial(0x01,0x20,lblP1_UP) , width = 20)
-buttonswtstP1_DOWN = ttk.Button(switchtestwindow, text='P1_DOWN', command= lambda: sendswitchserial(0x01,0x10,lblP1_DOWN) , width = 20)
-buttonswtstP1_LEFT = ttk.Button(switchtestwindow, text='P1_LEFT', command= lambda: sendswitchserial(0x01,0x08,lblP1_LEFT) , width = 20)
-buttonswtstP1_RIGHT = ttk.Button(switchtestwindow, text='P1_RIGHT', command= lambda: sendswitchserial(0x01,0x04,lblP1_RIGHT) , width = 20)
-buttonswtstP1_B1 = ttk.Button(switchtestwindow, text='P1_B1', command= lambda: sendswitchserial(0x01,0x02,lblP1_B1) , width = 20)
-buttonswtstP1_B2 = ttk.Button(switchtestwindow, text='P1_B2', command= lambda: sendswitchserial(0x01,0x01,lblP1_B2) , width = 20)
-buttonswtstP1_B3 = ttk.Button(switchtestwindow, text='P1_B3', command= lambda: sendswitchserial(0x02,0x80,lblP1_B3) , width = 20)
-buttonswtstP1_B4 = ttk.Button(switchtestwindow, text='P1_B4', command= lambda: sendswitchserial(0x02,0x40,lblP1_B4) , width = 20)
-buttonswtstP1_B5 = ttk.Button(switchtestwindow, text='P1_B5', command= lambda: sendswitchserial(0x02,0x20,lblP1_B5) , width = 20)
-buttonswtstP1_B6 = ttk.Button(switchtestwindow, text='P1_B6', command= lambda: sendswitchserial(0x02,0x10,lblP1_B6) , width = 20)
-buttonswtstP1_B7 = ttk.Button(switchtestwindow, text='P1_B7', command= lambda: sendswitchserial(0x02,0x08,lblP1_B7) , width = 20)
-buttonswtstP1_B8 = ttk.Button(switchtestwindow, text='P1_B8', command= lambda: sendswitchserial(0x02,0x04,lblP1_B8) , width = 20)
-buttonswtstP1_B9 = ttk.Button(switchtestwindow, text='P1_B9', command= lambda: sendswitchserial(0x02,0x02,lblP1_B9) , width = 20)
-buttonswtstP1_B10 = ttk.Button(switchtestwindow, text='P1_B10', command= lambda: sendswitchserial(0x02,0x01,lblP1_B10) , width = 20)
-buttonswtstP2_START = ttk.Button(switchtestwindow, text='P2_START', command= lambda: sendswitchserial(0x03,0x80,lblP2_START) , width = 20)
-buttonswtstP2_SERVICE = ttk.Button(switchtestwindow, text='P2_SERVICE', command= lambda: sendswitchserial(0x03,0x40,lblP2_SERVICE) , width = 20)
-buttonswtstP2_UP = ttk.Button(switchtestwindow, text='P2_UP', command= lambda: sendswitchserial(0x03,0x20,lblP2_UP) , width = 20)
-buttonswtstP2_DOWN = ttk.Button(switchtestwindow, text='P2_DOWN', command= lambda: sendswitchserial(0x03,0x10,lblP2_DOWN) , width = 20)
-buttonswtstP2_LEFT = ttk.Button(switchtestwindow, text='P2_LEFT', command= lambda: sendswitchserial(0x03,0x08,lblP2_LEFT) , width = 20)
-buttonswtstP2_RIGHT = ttk.Button(switchtestwindow, text='P2_RIGHT', command= lambda: sendswitchserial(0x03,0x04,lblP2_RIGHT) , width = 20)
-buttonswtstP2_B1 = ttk.Button(switchtestwindow, text='P2_B1', command= lambda: sendswitchserial(0x03,0x02,lblP2_B1) , width = 20)
-buttonswtstP2_B2 = ttk.Button(switchtestwindow, text='P2_B2', command= lambda: sendswitchserial(0x03,0x01,lblP2_B2) , width = 20)
-buttonswtstP2_B3 = ttk.Button(switchtestwindow, text='P2_B3', command= lambda: sendswitchserial(0x04,0x80,lblP2_B3) , width = 20)
-buttonswtstP2_B4 = ttk.Button(switchtestwindow, text='P2_B4', command= lambda: sendswitchserial(0x04,0x40,lblP2_B4) , width = 20)
-buttonswtstP2_B5 = ttk.Button(switchtestwindow, text='P2_B5', command= lambda: sendswitchserial(0x04,0x20,lblP2_B5) , width = 20)
-buttonswtstP2_B6 = ttk.Button(switchtestwindow, text='P2_B6', command= lambda: sendswitchserial(0x04,0x10,lblP2_B6) , width = 20)
-buttonswtstP2_B7 = ttk.Button(switchtestwindow, text='P2_B7', command= lambda: sendswitchserial(0x04,0x08,lblP2_B7) , width = 20)
-buttonswtstP2_B8 = ttk.Button(switchtestwindow, text='P2_B8', command= lambda: sendswitchserial(0x04,0x04,lblP2_B8) , width = 20)
-buttonswtstP2_B9 = ttk.Button(switchtestwindow, text='P2_B9', command= lambda: sendswitchserial(0x04,0x02,lblP2_B9) , width = 20)
-buttonswtstP2_B10 = ttk.Button(switchtestwindow, text='P2_B10', command= lambda: sendswitchserial(0x04,0x01,lblP2_B10) , width = 20)
-
-
-buttonswtstP1_START.grid(row=4,column=0)
-buttonswtstP1_SERVICE.grid(row=5,column=0)
-buttonswtstP1_UP.grid(row=6,column=0)
-buttonswtstP1_DOWN.grid(row=7,column=0)
-buttonswtstP1_LEFT.grid(row=8,column=0)
-buttonswtstP1_RIGHT.grid(row=9,column=0)
-buttonswtstP1_B1.grid(row=10,column=0)
-buttonswtstP1_B2.grid(row=11,column=0)
-buttonswtstP1_B3.grid(row=12,column=0)
-buttonswtstP1_B4.grid(row=13,column=0)
-buttonswtstP1_B5.grid(row=14,column=0)
-buttonswtstP1_B6.grid(row=15,column=0)
-buttonswtstP1_B7.grid(row=16,column=0)
-buttonswtstP1_B8.grid(row=17,column=0)
-buttonswtstP1_B9.grid(row=18,column=0)
-buttonswtstP1_B10.grid(row=19,column=0)
-buttonswtstP2_START.grid(row=4,column=3)
-buttonswtstP2_SERVICE.grid(row=5,column=3)
-buttonswtstP2_UP.grid(row=6,column=3)
-buttonswtstP2_DOWN.grid(row=7,column=3)
-buttonswtstP2_LEFT.grid(row=8,column=3)
-buttonswtstP2_RIGHT.grid(row=9,column=3)
-buttonswtstP2_B1.grid(row=10,column=3)
-buttonswtstP2_B2.grid(row=11,column=3)
-buttonswtstP2_B3.grid(row=12,column=3)
-buttonswtstP2_B4.grid(row=13,column=3)
-buttonswtstP2_B5.grid(row=14,column=3)
-buttonswtstP2_B6.grid(row=15,column=3)
-buttonswtstP2_B7.grid(row=16,column=3)
-buttonswtstP2_B8.grid(row=17,column=3)
-buttonswtstP2_B9.grid(row=18,column=3)
-buttonswtstP2_B10.grid(row=19,column=3)
+# buttonswtstP1_START = ttk.Button(switchtestwindow, text='P1_START', command= lambda: sendswitchserial(0x01,0x80,lblP1_START) , width = 20)
+# buttonswtstP1_SERVICE = ttk.Button(switchtestwindow, text='P1_SERVICE', command= lambda: sendswitchserial(0x01,0x40,lblP1_SERVICE) , width = 20)
+# buttonswtstP1_UP = ttk.Button(switchtestwindow, text='P1_UP', command= lambda: sendswitchserial(0x01,0x20,lblP1_UP) , width = 20)
+# buttonswtstP1_DOWN = ttk.Button(switchtestwindow, text='P1_DOWN', command= lambda: sendswitchserial(0x01,0x10,lblP1_DOWN) , width = 20)
+# buttonswtstP1_LEFT = ttk.Button(switchtestwindow, text='P1_LEFT', command= lambda: sendswitchserial(0x01,0x08,lblP1_LEFT) , width = 20)
+# buttonswtstP1_RIGHT = ttk.Button(switchtestwindow, text='P1_RIGHT', command= lambda: sendswitchserial(0x01,0x04,lblP1_RIGHT) , width = 20)
+# buttonswtstP1_B1 = ttk.Button(switchtestwindow, text='P1_B1', command= lambda: sendswitchserial(0x01,0x02,lblP1_B1) , width = 20)
+# buttonswtstP1_B2 = ttk.Button(switchtestwindow, text='P1_B2', command= lambda: sendswitchserial(0x01,0x01,lblP1_B2) , width = 20)
+# buttonswtstP1_B3 = ttk.Button(switchtestwindow, text='P1_B3', command= lambda: sendswitchserial(0x02,0x80,lblP1_B3) , width = 20)
+# buttonswtstP1_B4 = ttk.Button(switchtestwindow, text='P1_B4', command= lambda: sendswitchserial(0x02,0x40,lblP1_B4) , width = 20)
+# buttonswtstP1_B5 = ttk.Button(switchtestwindow, text='P1_B5', command= lambda: sendswitchserial(0x02,0x20,lblP1_B5) , width = 20)
+# buttonswtstP1_B6 = ttk.Button(switchtestwindow, text='P1_B6', command= lambda: sendswitchserial(0x02,0x10,lblP1_B6) , width = 20)
+# buttonswtstP1_B7 = ttk.Button(switchtestwindow, text='P1_B7', command= lambda: sendswitchserial(0x02,0x08,lblP1_B7) , width = 20)
+# buttonswtstP1_B8 = ttk.Button(switchtestwindow, text='P1_B8', command= lambda: sendswitchserial(0x02,0x04,lblP1_B8) , width = 20)
+# buttonswtstP1_B9 = ttk.Button(switchtestwindow, text='P1_B9', command= lambda: sendswitchserial(0x02,0x02,lblP1_B9) , width = 20)
+# buttonswtstP1_B10 = ttk.Button(switchtestwindow, text='P1_B10', command= lambda: sendswitchserial(0x02,0x01,lblP1_B10) , width = 20)
+# buttonswtstP2_START = ttk.Button(switchtestwindow, text='P2_START', command= lambda: sendswitchserial(0x03,0x80,lblP2_START) , width = 20)
+# buttonswtstP2_SERVICE = ttk.Button(switchtestwindow, text='P2_SERVICE', command= lambda: sendswitchserial(0x03,0x40,lblP2_SERVICE) , width = 20)
+# buttonswtstP2_UP = ttk.Button(switchtestwindow, text='P2_UP', command= lambda: sendswitchserial(0x03,0x20,lblP2_UP) , width = 20)
+# buttonswtstP2_DOWN = ttk.Button(switchtestwindow, text='P2_DOWN', command= lambda: sendswitchserial(0x03,0x10,lblP2_DOWN) , width = 20)
+# buttonswtstP2_LEFT = ttk.Button(switchtestwindow, text='P2_LEFT', command= lambda: sendswitchserial(0x03,0x08,lblP2_LEFT) , width = 20)
+# buttonswtstP2_RIGHT = ttk.Button(switchtestwindow, text='P2_RIGHT', command= lambda: sendswitchserial(0x03,0x04,lblP2_RIGHT) , width = 20)
+# buttonswtstP2_B1 = ttk.Button(switchtestwindow, text='P2_B1', command= lambda: sendswitchserial(0x03,0x02,lblP2_B1) , width = 20)
+# buttonswtstP2_B2 = ttk.Button(switchtestwindow, text='P2_B2', command= lambda: sendswitchserial(0x03,0x01,lblP2_B2) , width = 20)
+# buttonswtstP2_B3 = ttk.Button(switchtestwindow, text='P2_B3', command= lambda: sendswitchserial(0x04,0x80,lblP2_B3) , width = 20)
+# buttonswtstP2_B4 = ttk.Button(switchtestwindow, text='P2_B4', command= lambda: sendswitchserial(0x04,0x40,lblP2_B4) , width = 20)
+# buttonswtstP2_B5 = ttk.Button(switchtestwindow, text='P2_B5', command= lambda: sendswitchserial(0x04,0x20,lblP2_B5) , width = 20)
+# buttonswtstP2_B6 = ttk.Button(switchtestwindow, text='P2_B6', command= lambda: sendswitchserial(0x04,0x10,lblP2_B6) , width = 20)
+# buttonswtstP2_B7 = ttk.Button(switchtestwindow, text='P2_B7', command= lambda: sendswitchserial(0x04,0x08,lblP2_B7) , width = 20)
+# buttonswtstP2_B8 = ttk.Button(switchtestwindow, text='P2_B8', command= lambda: sendswitchserial(0x04,0x04,lblP2_B8) , width = 20)
+# buttonswtstP2_B9 = ttk.Button(switchtestwindow, text='P2_B9', command= lambda: sendswitchserial(0x04,0x02,lblP2_B9) , width = 20)
+# buttonswtstP2_B10 = ttk.Button(switchtestwindow, text='P2_B10', command= lambda: sendswitchserial(0x04,0x01,lblP2_B10) , width = 20)
 
 
-lblP1_START=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_SERVICE=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_UP=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_DOWN=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_LEFT=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_RIGHT=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B1=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B2=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B3=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B4=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B5=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B6=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B7=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B8=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B9=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP1_B10=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_START=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_SERVICE=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_UP=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_DOWN=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_LEFT=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_RIGHT=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B1=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B2=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B3=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B4=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B5=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B6=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B7=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B8=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B9=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
-lblP2_B10=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# buttonswtstP1_START.grid(row=4,column=0)
+# buttonswtstP1_SERVICE.grid(row=5,column=0)
+# buttonswtstP1_UP.grid(row=6,column=0)
+# buttonswtstP1_DOWN.grid(row=7,column=0)
+# buttonswtstP1_LEFT.grid(row=8,column=0)
+# buttonswtstP1_RIGHT.grid(row=9,column=0)
+# buttonswtstP1_B1.grid(row=10,column=0)
+# buttonswtstP1_B2.grid(row=11,column=0)
+# buttonswtstP1_B3.grid(row=12,column=0)
+# buttonswtstP1_B4.grid(row=13,column=0)
+# buttonswtstP1_B5.grid(row=14,column=0)
+# buttonswtstP1_B6.grid(row=15,column=0)
+# buttonswtstP1_B7.grid(row=16,column=0)
+# buttonswtstP1_B8.grid(row=17,column=0)
+# buttonswtstP1_B9.grid(row=18,column=0)
+# buttonswtstP1_B10.grid(row=19,column=0)
+# buttonswtstP2_START.grid(row=4,column=3)
+# buttonswtstP2_SERVICE.grid(row=5,column=3)
+# buttonswtstP2_UP.grid(row=6,column=3)
+# buttonswtstP2_DOWN.grid(row=7,column=3)
+# buttonswtstP2_LEFT.grid(row=8,column=3)
+# buttonswtstP2_RIGHT.grid(row=9,column=3)
+# buttonswtstP2_B1.grid(row=10,column=3)
+# buttonswtstP2_B2.grid(row=11,column=3)
+# buttonswtstP2_B3.grid(row=12,column=3)
+# buttonswtstP2_B4.grid(row=13,column=3)
+# buttonswtstP2_B5.grid(row=14,column=3)
+# buttonswtstP2_B6.grid(row=15,column=3)
+# buttonswtstP2_B7.grid(row=16,column=3)
+# buttonswtstP2_B8.grid(row=17,column=3)
+# buttonswtstP2_B9.grid(row=18,column=3)
+# buttonswtstP2_B10.grid(row=19,column=3)
 
 
+# lblP1_START=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_SERVICE=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_UP=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_DOWN=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_LEFT=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_RIGHT=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B1=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B2=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B3=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B4=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B5=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B6=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B7=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B8=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B9=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP1_B10=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_START=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_SERVICE=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_UP=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_DOWN=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_LEFT=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_RIGHT=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B1=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B2=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B3=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B4=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B5=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B6=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B7=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B8=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B9=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
+# lblP2_B10=Label(switchtestwindow, text='OFF',fg='black',justify=LEFT,anchor=W,width=20)
 
 
 
-lblP1_START.grid(row=4,column=1)
-lblP1_SERVICE.grid(row=5,column=1)
-lblP1_UP.grid(row=6,column=1)
-lblP1_DOWN.grid(row=7,column=1)
-lblP1_LEFT.grid(row=8,column=1)
-lblP1_RIGHT.grid(row=9,column=1)
-lblP1_B1.grid(row=10,column=1)
-lblP1_B2.grid(row=11,column=1)
-lblP1_B3.grid(row=12,column=1)
-lblP1_B4.grid(row=13,column=1)
-lblP1_B5.grid(row=14,column=1)
-lblP1_B6.grid(row=15,column=1)
-lblP1_B7.grid(row=16,column=1)
-lblP1_B8.grid(row=17,column=1)
-lblP1_B9.grid(row=18,column=1)
-lblP1_B10.grid(row=19,column=1)
-lblP2_START.grid(row=4,column=4)
-lblP2_SERVICE.grid(row=5,column=4)
-lblP2_UP.grid(row=6,column=4)
-lblP2_DOWN.grid(row=7,column=4)
-lblP2_LEFT.grid(row=8,column=4)
-lblP2_RIGHT.grid(row=9,column=4)
-lblP2_B1.grid(row=10,column=4)
-lblP2_B2.grid(row=11,column=4)
-lblP2_B3.grid(row=12,column=4)
-lblP2_B4.grid(row=13,column=4)
-lblP2_B5.grid(row=14,column=4)
-lblP2_B6.grid(row=15,column=4)
-lblP2_B7.grid(row=16,column=4)
-lblP2_B8.grid(row=17,column=4)
-lblP2_B9.grid(row=18,column=4)
-lblP2_B10.grid(row=19,column=4)
+
+
+# lblP1_START.grid(row=4,column=1)
+# lblP1_SERVICE.grid(row=5,column=1)
+# lblP1_UP.grid(row=6,column=1)
+# lblP1_DOWN.grid(row=7,column=1)
+# lblP1_LEFT.grid(row=8,column=1)
+# lblP1_RIGHT.grid(row=9,column=1)
+# lblP1_B1.grid(row=10,column=1)
+# lblP1_B2.grid(row=11,column=1)
+# lblP1_B3.grid(row=12,column=1)
+# lblP1_B4.grid(row=13,column=1)
+# lblP1_B5.grid(row=14,column=1)
+# lblP1_B6.grid(row=15,column=1)
+# lblP1_B7.grid(row=16,column=1)
+# lblP1_B8.grid(row=17,column=1)
+# lblP1_B9.grid(row=18,column=1)
+# lblP1_B10.grid(row=19,column=1)
+# lblP2_START.grid(row=4,column=4)
+# lblP2_SERVICE.grid(row=5,column=4)
+# lblP2_UP.grid(row=6,column=4)
+# lblP2_DOWN.grid(row=7,column=4)
+# lblP2_LEFT.grid(row=8,column=4)
+# lblP2_RIGHT.grid(row=9,column=4)
+# lblP2_B1.grid(row=10,column=4)
+# lblP2_B2.grid(row=11,column=4)
+# lblP2_B3.grid(row=12,column=4)
+# lblP2_B4.grid(row=13,column=4)
+# lblP2_B5.grid(row=14,column=4)
+# lblP2_B6.grid(row=15,column=4)
+# lblP2_B7.grid(row=16,column=4)
+# lblP2_B8.grid(row=17,column=4)
+# lblP2_B9.grid(row=18,column=4)
+# lblP2_B10.grid(row=19,column=4)
 
 
 
